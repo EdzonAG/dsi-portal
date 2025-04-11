@@ -1,0 +1,213 @@
+/* ===============================
+   General Styles
+   =============================== */
+   body {
+    background-color: #f8f9fa;
+    color: #212529;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===============================
+   Dark Mode General
+   =============================== */
+.dark-mode {
+    background-color: #3f3f3f;
+    color: #e0e0e0;
+}
+
+/* ===============================
+   Navbar Styles
+   =============================== */
+#main-navbar {
+    background-color: #00B0F6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+#main-navbar .navbar-brand img {
+    /* Asegúrate de que el logo se vea bien */
+    max-height: 45px;
+}
+.dark-mode #main-navbar {
+    background-color: #00B0F6;
+}
+
+/* ===============================
+   Botón de Cambio de Modo
+   =============================== */
+.mode-toggle-btn {
+    background-color: #FFC107;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+.mode-toggle-btn:hover {
+    background-color: #e0a800;
+}
+.mode-toggle-btn i {
+    color: #292929;
+    font-size: 1.2rem;
+}
+
+/* ===============================
+   Botones Modernos
+   =============================== */
+/* Puedes sobreescribir los botones primarios de Bootstrap */
+.btn-primary {
+    background-color: #00B0F6;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+    background-color: #0091c2;
+    transform: translateY(-2px);
+}
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-warning:hover {
+    background-color: #e0a800;
+    transform: translateY(-2px);
+}
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+/* ===============================
+   Sidebar Styles
+   =============================== */
+.sidebar {
+    padding: 1rem;
+    border-right: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+.sidebar .nav-link {
+    font-size: 1rem;
+    color: #212529;
+    transition: color 0.3s ease;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: #00B0F6;
+}
+.dark-mode .sidebar {
+    border-right: 1px solid #444;
+    background-color: #3f3f3f; 
+}
+.dark-mode .sidebar .nav-link {
+    color: #e0e0e0;
+}
+.dark-mode .sidebar .nav-link:hover,
+.dark-mode .sidebar .nav-link.active {
+    color: #00B0F6;
+}
+
+/* ===============================
+   Table Styles
+   =============================== */
+.table {
+    background-color: #212529;
+    color: #212529;
+}
+.dark-mode .table.table-bordered {
+    background-color: #000000 !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .table.table-bordered th,
+.dark-mode .table.table-bordered td {
+    border-color: #ffffff !important;
+}
+.dark-mode .table.table-bordered thead th {
+    background-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .table.table-bordered tbody tr {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+/* ===============================
+   Card Styles
+   =============================== */
+.card {
+    background-color: #ffffff;
+    color: #212529;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    transition: transform 0.2s ease;
+}
+.card:hover {
+    transform: translateY(-3px);
+}
+.dark-mode .card {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+/* ===============================
+   Footer Styles
+   =============================== */
+#main-footer {
+    background-color: #f1f1f1;
+    color: #212529;
+    font-size: 0.9rem;
+    width: 100%;
+}
+.dark-mode #main-footer {
+    background-color: #333;
+    color: #e0e0e0;
+}
+
+/* ===============================
+   Responsive Adjustments
+   =============================== */
+.form-control {
+    width: 35%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+}
+
+#username {
+    width: 70% !important;
+  }
+
+@media (max-width: 768px) {
+    .form-control {
+        width: 98%;
+    }
+    .sidebar {
+        padding: 0.5rem;
+    }
+    .sidebar .nav-link {
+        font-size: 0.9rem;
+    }
+    #username {
+        width: 98% !important;
+    }
+}

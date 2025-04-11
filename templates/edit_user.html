@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Editar Usuario: {{ user.username }}</h2>
+<form method="post">
+  <!-- Nombre de Usuario -->
+  <div class="mb-3">
+      <label class="form-label">Nombre de Usuario</label>
+      <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+  </div>
+  <!-- Nombre Completo -->
+  <div class="mb-3">
+      <label class="form-label">Nombre Completo</label>
+      <input type="text" name="nombre" class="form-control" value="{{ user.nombre }}" required>
+  </div>
+  <!-- Correo Electrónico -->
+  <div class="mb-3">
+      <label class="form-label">Correo Electrónico</label>
+      <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+  </div>
+  <!-- Módulos Permitidos -->
+  <div class="mb-3">
+      <p class="form-label">Módulos Permitidos</p>
+      {% for mod in modules %}
+          <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="allowed_modules" value="{{ mod.identifier }}" id="mod_{{ mod.identifier }}"
+              {% if mod.identifier in user.allowed_modules_list %}checked{% endif %}>
+              <label class="form-check-label" for="mod_{{ mod.identifier }}">{{ mod.title }}</label>
+          </div>
+      {% endfor %}
+      <small class="form-label">Selecciona los módulos a los que el usuario tendrá acceso.</small>
+  </div>
+  <!-- Admin Checkbox -->
+  <div class="mb-3 form-check">
+      <input type="checkbox" name="is_admin" class="form-check-input" id="is_admin" {% if user.is_admin %}checked{% endif %}>
+      <label class="form-check-label" for="is_admin">Administrador</label>
+  </div>
+  <!-- Suspendido Checkbox -->
+  <div class="mb-3 form-check">
+      <input type="checkbox" name="suspended" class="form-check-input" id="suspended" {% if user.suspended %}checked{% endif %}>
+      <label class="form-check-label" for="suspended">Suspender Usuario</label>
+  </div>
+  <!-- Nueva Contraseña (opcional) -->
+  <div class="mb-3">
+      <label for="password" class="form-label">Nueva Contraseña (opcional)</label>
+      <input type="password" name="password" class="form-control" placeholder="Déjalo en blanco para mantener la actual">
+  </div>
+<div class="mb-3">
+    <label for="creditos" class="form-label">Créditos</label>
+    <input type="number" name="creditos" class="form-control" value="{{ user.creditos }}" min="-1" required>
+    <small class="form-label">Número de créditos del usuario, usa "-1" para créditos ilimitados.</small>
+</div>
+  <button type="submit" class="btn btn-success">Actualizar Usuario</button>
+</form>
+{% endblock %}

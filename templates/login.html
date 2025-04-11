@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Iniciar Sesión</h2>
+<form method="post">
+    <div class="mb-3">
+        <label for="username" class="form-label">Usuario</label>
+        <input type="text" class="form-control" name="username" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" name="password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Entrar</button>
+</form>
+<br>
+<p>
+    <a href="{{ url_for('registration.register') }}" class="btn btn-success">Registrarse</a> 
+    <a href="{{ url_for('forgot.forgot_password') }}" class="btn btn-warning">Olvidé mi contraseña</a>
+</p>
+{% endblock %}

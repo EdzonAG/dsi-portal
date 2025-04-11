@@ -1,0 +1,4 @@
+Flask
+Flask_Login
+Flask-SQLAlchemy
+Flask_Mail

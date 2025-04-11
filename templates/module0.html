@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Volver al Menú Principal</a>
+</div>
+
+<h2 class="mt-4">Introducción al Portal de Herramientas DSI SECOMEXT</h2>
+
+<p>
+    Bienvenido al <strong>Portal de Herramientas DSI SECOMEXT</strong>. Este portal está diseñado para facilitar el acceso a una serie de herramientas y recursos que le ayudarán a optimizar sus tareas diarias. A continuación, se presenta un breve tutorial para que usted, como usuario, pueda sacar el máximo provecho a este sistema.
+</p>
+
+<h3>1. Navegación General</h3>
+<p>
+    Una vez que inicie sesión, encontrará el menú principal donde se muestran las diferentes secciones o módulos a los que tiene acceso. Si usted es administrador, tendrá acceso a todos los módulos; de lo contrario, solo se mostrarán aquellos que le hayan sido asignados.
+</p>
+
+<h3>2. Uso de la Barra Lateral</h3>
+<p>
+    Cuando se encuentre en un módulo, se desplegará una <strong>barra lateral</strong> que le permitirá navegar entre los distintos módulos sin tener que regresar al menú principal. Esta barra se genera dinámicamente según los módulos registrados en el sistema.
+</p>
+
+<h3>3. Publicación en Redes Sociales</h3>
+<p>
+    En el módulo <em>Publicador de Redes Sociales</em>, podrá:
+</p>
+<ul>
+    <li>Ingresar un mensaje (máximo 270 caracteres) que se publicará en redes sociales.</li>
+    <li>Adjuntar una imagen opcional mediante un sistema de arrastrar y soltar o seleccionándola desde su dispositivo.</li>
+    <li>Ver un preview de la imagen y, si lo desea, removerla antes de publicar.</li>
+</ul>
+
+<h3>4. Gestión de Usuarios y Módulos</h3>
+<p>
+    Los administradores del portal cuentan con un <strong>dashboard de administración</strong> que les permite:
+</p>
+<ul>
+    <li>Crear, editar y eliminar usuarios.</li>
+    <li>Asignar permisos para acceder a cada módulo.</li>
+    <li>Gestionar los módulos disponibles (añadir, editar o eliminar la metadata de los módulos) para que la interfaz se actualice de forma dinámica.</li>
+</ul>
+
+<h3>5. Funciones Adicionales</h3>
+<p>
+    Además de las funciones anteriores, el portal cuenta con:
+</p>
+<ul>
+    <li>Un sistema de notificaciones que informa a los usuarios sobre las acciones realizadas, como publicaciones exitosas o errores, mediante mensajes "flash".</li>
+    <li>La posibilidad de alternar entre <strong>modo claro y modo oscuro</strong>, lo cual se adapta a sus preferencias de visualización.</li>
+    <li>Un sistema de logs que registra las acciones realizadas por los usuarios (inicio de sesión, acceso a módulos, cambios en usuarios, etc.) para un posible análisis futuro.</li>
+</ul>
+
+<h3>6. Soporte y Ayuda</h3>
+<p>
+    Si tiene alguna pregunta o necesita asistencia, no dude en contactar al equipo de <strong>DSI</strong> a través de los canales de soporte establecidos. Su retroalimentación es muy importante para mejorar continuamente este portal.
+</p>
+
+<h3>Conclusión</h3>
+<p>
+    Esperamos que encuentre este portal útil y eficiente para sus tareas diarias. Le invitamos a explorar cada uno de los módulos y descubrir cómo cada herramienta puede ayudarle a optimizar su trabajo.
+</p>
+
+{% endblock %}

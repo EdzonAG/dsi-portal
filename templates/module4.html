@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mt-3">
+  <!-- Formulario y resultado (izquierda) -->
+  <div class="col-lg-5">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">Volver al Menú Principal</a>
+    <h2>Password Generator EVS</h2>
+    <form method="post">
+      <div class="mb-3">
+        <label for="username" class="form-label">Nombre de usuario:</label>
+        <input type="text" name="username" id="username" class="form-control"
+               placeholder="Introduce el nombre de usuario" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Generar Contraseña</button>
+    </form>
+
+    {% if generated_password and password_hash %}
+    <div class="mt-4 p-3 border rounded bg-light">
+      <h5>Resultado</h5>
+      <p>
+        <strong>Contraseña:</strong>
+        <code id="plain-password">{{ generated_password }}</code>
+        <button class="btn btn-sm btn-outline-secondary ms-2"
+                onclick="copyText('{{ generated_password }}')"
+                title="Copiar contraseña">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </p>
+      <p>
+        <strong>Hash:</strong>
+        <code id="hash-password">{{ password_hash }}</code>
+        <button class="btn btn-sm btn-outline-secondary ms-2"
+                onclick="copyText('{{ password_hash }}')"
+                title="Copiar hash">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Historial y búsqueda (derecha) -->
+  <div class="col-lg-7">
+    <h4>Últimas Contraseñas Generadas</h4>
+
+    <!-- Búsqueda por usuario -->
+    <form method="get" class="d-flex mb-3">
+      <input type="text"
+             name="search"
+             value="{{ search }}"
+             class="form-control me-2"
+             placeholder="Buscar por usuario">
+      <button type="submit" class="btn btn-outline-primary">Buscar</button>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-sm table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Contraseña</th>
+            <th>Hash</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in history %}
+          <tr>
+            <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>{{ item.username }}</td>
+            <td>
+              <span class="truncate" title="{{ item.password_plain }}">{{ item.password_plain }}</span>
+              <button class="btn btn-sm btn-outline-secondary ms-2"
+                      onclick="copyText('{{ item.password_plain }}')"
+                      title="Copiar contraseña">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </td>
+            <td>
+              <span class="truncate" title="{{ item.password_hash }}">{{ item.password_hash }}</span>
+              <button class="btn btn-sm btn-outline-secondary ms-2"
+                      onclick="copyText('{{ item.password_hash }}')"
+                      title="Copiar hash">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </td>
+            <td>
+              <form method="post"
+                    action="{{ url_for('password_generator.delete_password_entry', entry_id=item.id, search=search) }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar este registro?');">
+                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Copiar al portapapeles -->
+<script>
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-success position-fixed top-50 start-50 translate-middle';
+      alertDiv.style.zIndex = 2000;
+      alertDiv.textContent = 'Copiado al portapapeles';
+      document.body.appendChild(alertDiv);
+      setTimeout(() => alertDiv.remove(), 1500);
+    }).catch(err => {
+      console.error('Error copiando al portapapeles', err);
+    });
+  }
+</script>
+
+<!-- Estilos para truncar -->
+<style>
+  .truncate {
+    display: inline-block;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+  @media (max-width: 768px) {
+    .truncate {
+      max-width: 100px;
+    }
+  }
+</style>
+{% endblock %}

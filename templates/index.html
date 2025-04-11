@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-center">Portal de Herramientas de DSI - SECOMEXT</h1>
+{% if current_user.is_authenticated %}
+  {% if modules %}
+    <div class="row mt-4">
+      {% for mod in modules %}
+        <div class="col-md-3 mb-4">
+          <div class="card h-100">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">{{ mod.title }}</h5>
+              <p class="card-text">{{ mod.description }}</p>
+              <a href="{{ url_for(mod.url_endpoint.split('.')[0] + '.' + mod.url_endpoint.split('.')[1]) }}" class="btn btn-primary mt-auto">Ir a {{ mod.title }}</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center">No tienes módulos asignados.</p>
+  {% endif %}
+{% else %}
+  <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <p class="text-center">Por favor, <a href="{{ url_for('auth.login') }}" class="btn btn-secondary"">inicia sesión</a> para ver las herramientas de este portal.</p>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al Menú Principal</a>
+</div>
+<h2>Panel de Administración</h2>
+
+<!-- Sección de Usuarios -->
+<h3>Usuarios</h3>
+<a href="{{ url_for('admin.create_user') }}" class="btn btn-success mb-3">Crear Nuevo Usuario</a>
+<div class="table-responsive">
+  <table class="table table-bordered">
+      <thead>
+          <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Admin</th>
+              <th>Módulos</th>
+              <th>Suspendido</th>
+              <th>Créditos</th>
+              <th>Acciones</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for user in users %}
+          <tr>
+              <td>{{ user.id }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.nombre }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ "Sí" if user.is_admin else "No" }}</td>
+              <td>{{ user.allowed_modules_list | join(", ") }}</td>
+              <td>{{ "Sí" if user.suspended else "No" }}</td>
+              <td>{{ user.creditos }}</td>
+              <td>
+                  <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                  <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro?');">
+                      <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                  </form>
+              </td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+</div>
+
+<hr>
+{% if current_user.is_authenticated and current_user.username == 'admin' %}
+<!-- Sección de Módulos -->
+<h3>Módulos</h3>
+<a href="{{ url_for('admin.create_module') }}" class="btn btn-success mb-3">Crear Nuevo Módulo</a>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Identificador</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>URL Endpoint</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mod in modules %}
+            <tr>
+                <td>{{ mod.id }}</td>
+                <td>{{ mod.identifier }}</td>
+                <td>{{ mod.title }}</td>
+                <td>{{ mod.description }}</td>
+                <td>{{ mod.url_endpoint }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_module', module_id=mod.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                    <form action="{{ url_for('admin.delete_module', module_id=mod.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este módulo?');">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Registro de Usuario</h2>
+<form method="post" onsubmit="return validateForm()">
+  <div class="mb-3">
+    <label for="username" class="form-label">Nombre de Usuario</label>
+    <input type="text" class="form-control" name="username" id="username" required pattern="^[a-z]+$" title="El nombre de usuario solo puede contener letras minúsculas sin espacios ni caracteres especiales.">
+  </div>
+  <div class="mb-3">
+    <label for="nombre" class="form-label">Nombre Completo</label>
+    <input type="text" class="form-control" name="nombre" id="nombre" required>
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Correo Electrónico</label>
+    <input type="email" class="form-control" name="email" id="email" required>
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Contraseña</label>
+    <input type="password" class="form-control" name="password" id="password" required>
+    <small id="password_strength" class="form-label"></small>
+  </div>
+  <div class="mb-3">
+    <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+    <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
+    <small id="password_match" class="form-label"></small>
+  </div>
+  <button type="submit" class="btn btn-primary">Registrarse</button>
+</form>
+<script>
+function validatePasswordStrength(password) {
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  return regex.test(password);
+}
+
+function checkPassword() {
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm_password").value;
+  const strengthEl = document.getElementById("password_strength");
+  const matchEl = document.getElementById("password_match");
+  
+  if (password.length === 0) {
+    strengthEl.textContent = "";
+  } else if (!validatePasswordStrength(password)) {
+    strengthEl.textContent = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.";
+    strengthEl.style.color = "red";
+  } else {
+    strengthEl.textContent = "Contraseña segura.";
+    strengthEl.style.color = "green";
+  }
+  
+  if (confirm.length === 0) {
+    matchEl.textContent = "";
+  } else if (password !== confirm) {
+    matchEl.textContent = "Las contraseñas no coinciden.";
+    matchEl.style.color = "red";
+  } else {
+    matchEl.textContent = "Las contraseñas coinciden.";
+    matchEl.style.color = "green";
+  }
+}
+
+function validateForm() {
+  // Validación del nombre de usuario: solo letras minúsculas sin espacios ni caracteres especiales
+  const username = document.getElementById("username").value;
+  if (!/^[a-z]+$/.test(username)) {
+    alert("El nombre de usuario solo puede contener letras minúsculas sin espacios ni caracteres especiales.");
+    return false;
+  }
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm_password").value;
+  if (!validatePasswordStrength(password)) {
+    alert("La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.");
+    return false;
+  }
+  if (password !== confirm) {
+    alert("Las contraseñas no coinciden.");
+    return false;
+  }
+  return true;
+}
+
+document.getElementById("password").addEventListener("keyup", checkPassword);
+document.getElementById("confirm_password").addEventListener("keyup", checkPassword);
+</script>
+{% endblock %}
