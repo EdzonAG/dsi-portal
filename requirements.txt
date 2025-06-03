@@ -1,4 +1,9 @@
 Flask
-Flask_Login
+Flask-Login
 Flask-SQLAlchemy
-Flask_Mail
+Flask-Mail
+tweepy
+facebook-sdk
+requests
+fpdf
+passlib
