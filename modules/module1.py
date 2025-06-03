@@ -75,7 +75,7 @@ def notificar_telegram(texto):
     if not config:
         return
     for chat_id in config["CHAT_IDS"]:
-        url = f"https://149.154.167.220/bot{config["TOKEN_TELEGRAM"]}/sendMessage?chat_id={chat_id}&text={texto}"
+        url = f"https://149.154.167.220/bot{config['TOKEN_TELEGRAM']}/sendMessage?chat_id={chat_id}&text={texto}"
         headers = {'Host': 'api.telegram.org'} 
         try:
             response = requests.get(url, headers=headers, verify=False, timeout=5)
