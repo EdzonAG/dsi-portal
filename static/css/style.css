@@ -13,7 +13,7 @@
    Dark Mode General
    =============================== */
 .dark-mode {
-    background-color: #3f3f3f;
+    background-color: #212529;
     color: #e0e0e0;
 }
 
@@ -118,7 +118,7 @@
 }
 .dark-mode .sidebar {
     border-right: 1px solid #444;
-    background-color: #3f3f3f; 
+    background-color: #343a40;
 }
 .dark-mode .sidebar .nav-link {
     color: #e0e0e0;
@@ -132,24 +132,13 @@
    Table Styles
    =============================== */
 .table {
-    background-color: #212529;
-    color: #212529;
+    --bs-table-bg: #ffffff;
+    --bs-table-color: #212529;
 }
-.dark-mode .table.table-bordered {
-    background-color: #000000 !important;
-    color: #e0e0e0 !important;
-}
-.dark-mode .table.table-bordered th,
-.dark-mode .table.table-bordered td {
-    border-color: #ffffff !important;
-}
-.dark-mode .table.table-bordered thead th {
-    background-color: #333 !important;
-    color: #e0e0e0 !important;
-}
-.dark-mode .table.table-bordered tbody tr {
-    background-color: #1e1e1e !important;
-    color: #e0e0e0 !important;
+.dark-mode .table {
+    --bs-table-bg: #1e1e1e;
+    --bs-table-color: #e0e0e0;
+    --bs-table-border-color: #ffffff;
 }
 
 /* ===============================
@@ -187,27 +176,18 @@
 /* ===============================
    Responsive Adjustments
    =============================== */
+
+/* Form controls */
 .form-control {
-    width: 35%;
     box-sizing: border-box;
     padding: 8px 12px;
 }
 
-#username {
-    width: 70% !important;
-  }
-
 @media (max-width: 768px) {
-    .form-control {
-        width: 98%;
-    }
     .sidebar {
         padding: 0.5rem;
     }
     .sidebar .nav-link {
         font-size: 0.9rem;
-    }
-    #username {
-        width: 98% !important;
     }
 }
