@@ -60,6 +60,7 @@ def password_generator_home():
         db.session.add(registro)
         db.session.commit()
         flash(f"Contraseña generada para '{username}'", "success")
+        return redirect(url_for('password_generator.password_generator_home'))
 
     # 4) Soporta búsqueda por usuario y obtiene las últimas 20 entradas
     search = request.args.get('search', '').strip()
