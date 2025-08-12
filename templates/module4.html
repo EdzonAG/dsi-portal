@@ -3,15 +3,15 @@
 <div class="sheet sheet-wide">
   <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3 mb-3">Volver al Menú Principal</a>
 
-  <h2 class="mb-3">Password Generator</h2>
+  <h2 class="mb-3">{{ module_name }}</h2>
 
   <!-- Panel del formulario -->
   <div class="panel mb-4">
-    <form method="post">
+    <form method="post" autocomplete="off">
       <div class="mb-3">
         <label for="username" class="form-label">Nombre de usuario/cuenta:</label>
         <input type="text" name="username" id="username" class="form-control"
-               placeholder="Introduce el nombre de usuario" required>
+               placeholder="Introduce el nombre de usuario" required autocomplete="off" autocapitalize="none" autocorrect="off">
       </div>
       <button type="submit" class="btn btn-primary">Generar Contraseña</button>
     </form>
@@ -56,14 +56,14 @@
             <th>Usuario</th>
             <th>Contraseña</th>
             <th>Hash</th>
-            <th>Acciones</th>
+            <th>Acción</th>
           </tr>
         </thead>
         <tbody>
           {% for item in history %}
           <tr>
-            <td>{{ item.created_at.strftime('%y-%m-%d %H:%M') }}</td>
-            <td><span class="truncate" title="{{ item.username }}">{{ item.username }}</span></td>
+            <td>{{ item.created_at.strftime('%d/%m/%y') }}</td>
+            <td><span title="{{ item.username }}">{{ item.username }}</span></td>
             <td>
               <span class="truncate" title="{{ item.password_plain }}">{{ item.password_plain }}</span>
               <button class="btn btn-sm btn-secondary ms-2" onclick="copyText('{{ item.password_plain }}')" title="Copiar contraseña">
@@ -94,11 +94,11 @@
 
   <style>
     .truncate{
-      display:inline-block; max-width:240px;
+      display:inline-block; max-width:150px;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:middle;
     }
     @media (max-width: 768px){
-      .truncate{ max-width:140px; }
+      .truncate{ max-width:100px; }
     }
   </style>
 </div>

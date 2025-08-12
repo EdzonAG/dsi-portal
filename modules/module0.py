@@ -8,4 +8,4 @@ module0_bp = Blueprint('tutorial', __name__, template_folder='../templates')
 @login_required
 @module_permission_required('tutorial')
 def tutorial_home():
-    return render_template('module0.html', show_sidebar=True, modules=Module.query.all())
+    return render_template('module0.html', show_sidebar=True, modules=Module.query.all(), module_name = Module.query.filter_by(identifier="tutorial").first().title)

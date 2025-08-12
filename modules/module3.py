@@ -78,7 +78,8 @@ def minutas_home():
     return render_template('module3.html',
                            user=user,
                            show_sidebar=True, 
-                           modules=Module.query.all())
+                           modules=Module.query.all(),
+                           module_name = Module.query.filter_by(identifier="minutas").first().title)
 
 @module3_bp.route('/download/<filename>')
 @login_required

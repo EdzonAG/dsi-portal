@@ -84,4 +84,5 @@ def tokens_home():
                             token_openai=token_openai,
                             date_fb=date_fb,
                             show_sidebar=True,
-                            modules=Module.query.all())
+                            modules=Module.query.all(),
+                            module_name = Module.query.filter_by(identifier="tokens").first().title)

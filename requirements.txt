@@ -8,3 +8,4 @@ requests
 fpdf
 passlib
 pytest
+segno

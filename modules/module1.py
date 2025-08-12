@@ -111,4 +111,4 @@ def publisher_home():
         notificar_telegram(resumen + f"\nMensaje: {mensaje}")
         flash(resumen, "success")
         return redirect(url_for('publisher.publisher_home'))
-    return render_template('module1.html', show_sidebar=True, modules=Module.query.all())
+    return render_template('module1.html', show_sidebar=True, modules=Module.query.all(), module_name = Module.query.filter_by(identifier='publisher').first().title)

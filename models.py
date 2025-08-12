@@ -118,9 +118,14 @@ class GeneratedPassword(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     
     
+# models.py
 class PSPs(db.Model):
     __tablename__ = 'credentials'
-    id = db.Column(db.String, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    valid = db.Column(db.Boolean, nullable=False)
+    id              = db.Column(db.String(40), primary_key=True)  # p.ej. DSI-EOAG, DSI-EOAG-2
+    name            = db.Column(db.String(120), nullable=False)
+    email           = db.Column(db.String(255), nullable=False)
+    direccion       = db.Column(db.String(120), nullable=False)   # Dirección del PSP
+    servicio        = db.Column(db.String(255), nullable=True)    # Requerimiento de Servicio
+    telefono        = db.Column(db.String(32),  nullable=True)
+    valid           = db.Column(db.Boolean, nullable=False, default=True)
     expiration_date = db.Column(db.DateTime, nullable=True)

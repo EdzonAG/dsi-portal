@@ -11,7 +11,7 @@
   --accent: #35c1e0;
   --accent-2: #6dc7ff;
   --ring: #2de3d3;
-  --brand-azul: #00B0F6;
+  --brand-azul: #2390ba;
 
   --border-alpha: rgba(77,114,159,.25);
   --border-alpha-2: rgba(77,114,159,.18);
@@ -24,17 +24,32 @@
 }
 
 *{ box-sizing:border-box }
-html,body{ height:100% }
+html, body { min-height: 100%; }
 body{
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
   line-height:1.4;
   color: var(--txt);
+  background: transparent;           /* el fondo ahora lo pinta ::before */
+  position: relative;
+}
+
+/* Fondo global fijo sin uniones/“rayas” */
+body::before{
+  content: "";
+  position: fixed;      /* no se repinta al hacer scroll */
+  inset: 0;
+  z-index: -1;          /* detrás de todo */
   background:
     radial-gradient(1200px 600px at 10% 10%, rgba(53,224,161,.12), transparent 60%),
-    radial-gradient(800px 500px at 90% 20%, rgba(109,199,255,.10), transparent 55%),
+    radial-gradient(900px 500px at 85% 20%,  rgba(109,199,255,.10), transparent 55%),
+    /* leve viñeta inferior para evitar banding en esquinas largas */
+    radial-gradient(1200px 700px at 0% 100%, rgba(12,20,31,.35), transparent 60%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-attachment: fixed, fixed, fixed, fixed;
 }
+
 
 *{
   transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease, transform .15s ease;
@@ -66,8 +81,8 @@ body{
 }
 
 /* Ancho más amplio solo cuando se necesite (tablas grandes, listados) */
-/* .sheet-wide { max-width: 1100px; }
-@media (max-width: 1200px) { .sheet-wide { max-width: 96%; } } */
+/* .sheet-wide { max-width: 900px; }
+@media (max-width: 1000px) { .sheet-wide { max-width: 80%; } } */
 
 
 /* .panel: bloque estilo “glass panel” */
@@ -111,6 +126,19 @@ body{
   border:1px solid var(--ring);
   box-shadow:0 0 0 3px rgba(45,227,211,.18), inset 0 0 40px rgba(53,224,161,.10);
 }
+
+/* Offcanvas móvil (oscuro) */
+.offcanvas {
+  background: var(--panel, #0e1621);
+  color: var(--txt, #e6f1ff);
+  border-right: 1px solid rgba(77,114,159,.25);
+}
+.offcanvas-header { border-bottom: 1px solid rgba(77,114,159,.18); }
+.offcanvas .nav-link { color: var(--txt, #e6f1ff); }
+.offcanvas .nav-link.active,
+.offcanvas .nav-link:hover { color: #00B0F6; }
+.btn-close-white { filter: invert(1) grayscale(100%); }
+
 
 /* ===============================
    Cards

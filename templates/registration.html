@@ -5,33 +5,70 @@
 
   <div class="panel">
     <form method="post" onsubmit="return validateForm()">
+      <!-- Usuario -->
       <div class="mb-3">
         <label for="username" class="form-label">Nombre de Usuario</label>
-        <input type="text" class="form-control" name="username" id="username" required
-               pattern="^[a-z]+$"
-               title="Solo letras minúsculas, sin espacios ni caracteres especiales.">
-        <small class="form-text">Usa únicamente letras minúsculas (ej. <code>jlopez</code>).</small>
+        <input
+          type="text"
+          class="form-control"
+          name="username"
+          id="username"
+          required
+          inputmode="latin"
+          autocapitalize="off"
+          autocomplete="username"
+          maxlength="20"
+          pattern="^[a-z]{1,20}$"
+          title="Solo letras minúsculas, sin espacios ni caracteres especiales. Máximo 20."
+        >
+        <small id="username_help" class="form-text">
+          Solo minúsculas (ej. <code>jlopez</code>). Máximo 20 caracteres.
+        </small>
       </div>
 
+      <!-- Nombre completo -->
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre Completo</label>
-        <input type="text" class="form-control" name="nombre" id="nombre" required>
+        <input
+          type="text"
+          class="form-control"
+          name="nombre"
+          id="nombre"
+          required
+          maxlength="80"
+          pattern="^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:\s[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$"
+          title="Solo letras y espacios (con acentos y ñ)."
+          autocomplete="name"
+        >
+        <small id="nombre_help" class="form-text"></small>
       </div>
 
+      <!-- Correo -->
       <div class="mb-3">
         <label for="email" class="form-label">Correo Electrónico</label>
-        <input type="email" class="form-control" name="email" id="email" required>
+        <input
+          type="email"
+          class="form-control"
+          name="email"
+          id="email"
+          required
+          autocomplete="email"
+          pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+          title="Escribe un correo válido (ej. usuario@dominio.com)."
+        >
+        <small id="email_help" class="form-text"></small>
       </div>
 
+      <!-- Password -->
       <div class="mb-3">
         <label for="password" class="form-label">Contraseña</label>
-        <input type="password" class="form-control" name="password" id="password" required>
+        <input type="password" class="form-control" name="password" id="password" required autocomplete="new-password">
         <small id="password_strength" class="form-text"></small>
       </div>
 
       <div class="mb-3">
         <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-        <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
+        <input type="password" class="form-control" name="confirm_password" id="confirm_password" required autocomplete="new-password">
         <small id="password_match" class="form-text"></small>
       </div>
 
@@ -41,58 +78,100 @@
 </div>
 
 <script>
-function validatePasswordStrength(password) {
-  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+/* --------- Utilidades de validación --------- */
+function validatePasswordStrength(password){
+  // min 8, mayúscula, minúscula, número y caracter especial
+  const regex=/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
   return regex.test(password);
 }
-
-function checkPassword() {
-  const password = document.getElementById("password").value;
-  const confirm = document.getElementById("confirm_password").value;
-  const strengthEl = document.getElementById("password_strength");
-  const matchEl = document.getElementById("password_match");
-
-  if (password.length === 0) {
-    strengthEl.textContent = "";
-  } else if (!validatePasswordStrength(password)) {
-    strengthEl.textContent = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.";
-    strengthEl.style.color = "red";
-  } else {
-    strengthEl.textContent = "Contraseña segura.";
-    strengthEl.style.color = "green";
-  }
-
-  if (confirm.length === 0) {
-    matchEl.textContent = "";
-  } else if (password !== confirm) {
-    matchEl.textContent = "Las contraseñas no coinciden.";
-    matchEl.style.color = "red";
-  } else {
-    matchEl.textContent = "Las contraseñas coinciden.";
-    matchEl.style.color = "green";
-  }
+function isValidUsername(v){
+  return /^[a-z]{1,20}$/.test(v);
+}
+function isValidFullName(v){
+  return /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:\s[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+)*$/.test(v);
+}
+function isValidEmail(v){
+  return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(v);
 }
 
-function validateForm() {
-  const username = document.getElementById("username").value;
-  if (!/^[a-z]+$/.test(username)) {
-    alert("El nombre de usuario solo puede contener letras minúsculas sin espacios ni caracteres especiales.");
+/* --------- Feedback en tiempo real --------- */
+const usernameEl=document.getElementById("username");
+const nombreEl=document.getElementById("nombre");
+const emailEl=document.getElementById("email");
+const passEl=document.getElementById("password");
+const pass2El=document.getElementById("confirm_password");
+
+usernameEl.addEventListener("input", ()=>{
+  // Forzar minúsculas, sin espacios, quitar no permitidos y limitar a 20
+  usernameEl.value = usernameEl.value.toLowerCase().replace(/[^a-z]/g,"").slice(0,20);
+  const help=document.getElementById("username_help");
+  if(usernameEl.value.length===0){ help.textContent="Solo minúsculas. Máximo 20 caracteres."; help.style.color=""; }
+  else if(!isValidUsername(usernameEl.value)){ help.textContent="Formato inválido."; help.style.color="red"; }
+  else{ help.textContent="Formato correcto."; help.style.color="green"; }
+});
+
+nombreEl.addEventListener("input", ()=>{
+  // Sanea: solo letras/espacios, colapsa espacios múltiples
+  nombreEl.value=nombreEl.value.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g,"").replace(/\s{2,}/g," ").replace(/^\s+/,"");
+  const help=document.getElementById("nombre_help");
+  if(nombreEl.value.length===0){ help.textContent=""; help.style.color=""; }
+  else if(!isValidFullName(nombreEl.value)){ help.textContent="Solo letras y un espacio entre palabras."; help.style.color="red"; }
+  else{ help.textContent="Formato correcto."; help.style.color="green"; }
+});
+
+emailEl.addEventListener("input", ()=>{
+  const help=document.getElementById("email_help");
+  if(emailEl.value.length===0){ help.textContent=""; help.style.color=""; }
+  else if(!isValidEmail(emailEl.value)){ help.textContent="Correo no válido."; help.style.color="red"; }
+  else{ help.textContent="Correo válido."; help.style.color="green"; }
+});
+
+function checkPassword(){
+  const password=passEl.value;
+  const confirm=pass2El.value;
+  const strengthEl=document.getElementById("password_strength");
+  const matchEl=document.getElementById("password_match");
+
+  if(password.length===0){ strengthEl.textContent=""; strengthEl.style.color=""; }
+  else if(!validatePasswordStrength(password)){ strengthEl.textContent="La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."; strengthEl.style.color="red"; }
+  else{ strengthEl.textContent="Contraseña segura."; strengthEl.style.color="green"; }
+
+  if(confirm.length===0){ matchEl.textContent=""; matchEl.style.color=""; }
+  else if(password!==confirm){ matchEl.textContent="Las contraseñas no coinciden."; matchEl.style.color="red"; }
+  else{ matchEl.textContent="Las contraseñas coinciden."; matchEl.style.color="green"; }
+}
+passEl.addEventListener("keyup", checkPassword);
+pass2El.addEventListener("keyup", checkPassword);
+
+/* --------- Validación final del formulario --------- */
+function validateForm(){
+  const u=usernameEl.value;
+  const n=nombreEl.value.trim();
+  const e=emailEl.value.trim();
+  const p=passEl.value;
+  const c=pass2El.value;
+
+  if(!isValidUsername(u)){
+    alert("Usuario inválido. Solo minúsculas (a–z), sin espacios, máximo 20.");
     return false;
   }
-  const password = document.getElementById("password").value;
-  const confirm = document.getElementById("confirm_password").value;
-  if (!validatePasswordStrength(password)) {
+  if(!isValidFullName(n)){
+    alert("Nombre inválido. Solo letras (incluye acentos y ñ) y espacios únicos entre palabras.");
+    return false;
+  }
+  if(!isValidEmail(e)){
+    alert("Correo inválido. Usa el formato usuario@dominio.tld");
+    return false;
+  }
+  if(!validatePasswordStrength(p)){
     alert("La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.");
     return false;
   }
-  if (password !== confirm) {
+  if(p!==c){
     alert("Las contraseñas no coinciden.");
     return false;
   }
   return true;
 }
-
-document.getElementById("password").addEventListener("keyup", checkPassword);
-document.getElementById("confirm_password").addEventListener("keyup", checkPassword);
 </script>
 {% endblock %}

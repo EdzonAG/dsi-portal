@@ -42,7 +42,7 @@ def password_generator_home():
     password_hash = None
 
     if request.method == 'POST':
-        username = request.form.get('username').strip()
+        username = (request.form.get('username') or request.form.get('user') or '').strip()
         if not username:
             flash("Debe indicar un nombre de usuario.", "danger")
             return redirect(url_for('password_generator.password_generator_home'))
@@ -77,7 +77,8 @@ def password_generator_home():
         generated_password=generated_password,
         password_hash=password_hash,
         history=history,
-        search=search
+        search=search,
+        module_name = Module.query.filter_by(identifier="password_generator").first().title
     )
     
 @module4_bp.route('/delete/<int:entry_id>', methods=['POST'])

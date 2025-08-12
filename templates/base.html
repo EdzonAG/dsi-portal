@@ -48,6 +48,24 @@
                   <i class="fa-solid fa-right-to-bracket me-1"></i> Iniciar Sesión
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="btn btn-success btn-nav" href="{{ url_for('registration.register') }}">
+                  <i class="fa-solid fa-user-plus me-1"></i> Registrarse
+                </a>
+              </li>
+            {% endif %}
+
+            {# Botón "Módulos" solo en móvil y solo si hay sidebar #}
+            {% if show_sidebar %}
+            <li class="nav-item d-md-none">
+              <button class="btn btn-light btn-sm ms-2"
+                      type="button"
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#modulesOffcanvas"
+                      aria-controls="modulesOffcanvas">
+                <i class="fa-solid fa-grip me-1"></i> Módulos
+              </button>
+            </li>
             {% endif %}
           </ul>
         </div>
@@ -72,7 +90,8 @@
     {% if show_sidebar %}
       <div class="container-fluid flex-fill main-wrap">
         <div class="row g-3">
-          <nav id="sidebar" class="col-12 col-md-3 col-lg-2 sidebar">
+          <!-- Sidebar solo en >= md -->
+          <nav id="sidebar" class="d-none d-md-block col-md-3 col-lg-2 sidebar">
             <div class="position-sticky pt-1">
               <ul class="nav flex-column">
                 {% for mod in modules %}
@@ -110,10 +129,35 @@
     </footer>
   </div>
 
+  {# Offcanvas de módulos (solo móvil y solo si hay sidebar) #}
+  {% if show_sidebar %}
+  <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="modulesOffcanvas" aria-labelledby="modulesOffcanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="modulesOffcanvasLabel">Módulos</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        {% for mod in modules %}
+          {% if current_user.is_admin or mod.identifier in current_user.allowed_modules_list %}
+            <li class="nav-item">
+              <!-- IMPORTANTE: sin data-bs-dismiss para no bloquear la navegación -->
+              <a class="nav-link {% if request.endpoint == mod.url_endpoint %}active{% endif %}"
+                 href="{{ url_for(mod.url_endpoint) }}">
+                {{ mod.title }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Auto-cierre de alerts -->
+  <!-- Cerrar alerts automáticamente -->
   <script>
     window.setTimeout(function() {
       const alerts = document.querySelectorAll('.alert');
@@ -123,6 +167,22 @@
         setTimeout(function() { alert.remove(); }, 500);
       });
     }, 5000);
+  </script>
+
+  <!-- Cerrar offcanvas al hacer click en un enlace, sin impedir navegación -->
+  <script>
+    (function(){
+      const el = document.getElementById('modulesOffcanvas');
+      if(!el) return;
+      const links = el.querySelectorAll('.nav-link[href]');
+      links.forEach(a=>{
+        a.addEventListener('click', function(){
+          const inst = bootstrap.Offcanvas.getInstance(el) || new bootstrap.Offcanvas(el);
+          // No llamamos preventDefault; solo ocultamos visualmente mientras navega
+          inst.hide();
+        });
+      });
+    })();
   </script>
 </body>
 </html>

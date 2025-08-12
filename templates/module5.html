@@ -3,50 +3,18 @@
 <div class="sheet sheet-wide">
   <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3 mb-3">Volver al Menú Principal</a>
 
-  <h2 class="mb-3">Administrador Credenciales</h2>
-
-  <!-- === Formulario: alta/edición rápida de PSP === -->
-  <div class="panel mb-4">
-    <form method="post">
-      <div class="mb-3">
-        <label for="id_psp" class="form-label">ID PSP</label>
-        <input type="text" name="id_psp" id="id_psp"
-               class="form-control" placeholder="Ej: ABCD"
-               required maxlength="4" pattern="^[a-zA-Z]*$">
-      </div>
-
-      <div class="mb-3">
-        <label for="name_psp" class="form-label">Nombre Completo</label>
-        <input type="text" name="name_psp" id="name_psp"
-               class="form-control" placeholder="Nombre completo del PSP" required>
-      </div>
-
-      <div class="mb-3">
-        <label for="status_psp" class="form-label">Estado</label>
-        <select name="status_psp" id="status_psp" class="form-select">
-          <option value="activo">Activo</option>
-          <option value="inactivo">Inactivo</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label for="expiration_date_psp" class="form-label">Fecha de Expiración</label>
-        <input type="date" name="expiration_date_psp" id="expiration_date_psp"
-               class="form-control" required>
-      </div>
-
-      <button type="submit" class="btn btn-primary">Añadir nuevo PSP</button>
-    </form>
+  <div class="d-flex align-items-center justify-content-between">
+    <h2 class="mb-2">{{ module_name }}</h2>
+    <a href="{{ url_for('credenciales.add_psp') }}" class="btn btn-primary">
+      <i class="fa-solid fa-user-plus me-1"></i> Añadir PSP
+    </a>
   </div>
 
-  <!-- === Listado + Búsqueda === -->
   <div class="d-flex align-items-center justify-content-between mb-2">
     <h4 class="mb-0">Listado de PSPs</h4>
-
-    <!-- {# BACKEND: lee querystring ?search=... y pásalo como 'search' al template #} -->
     <form method="get" class="d-flex gap-2">
-      <input type="text" name="search" value="{{ search or '' }}"
-             class="form-control" placeholder="Buscar por ID o nombre">
+      <input type="text" name="search" value="{{ search or '' }}" class="form-control"
+             placeholder="Buscar por ID, nombre, correo, dirección, servicio...">
       <button type="submit" class="btn btn-secondary">Buscar</button>
     </form>
   </div>
@@ -58,54 +26,45 @@
           <tr>
             <th>ID</th>
             <th>Nombre</th>
+            <!-- <th>Correo</th> -->
+            <!-- <th>Dirección</th> -->
+            <!-- <th>Servicio</th> -->
             <th>Estado</th>
-            <th>Fecha Expiración</th>
-            <th style="width:140px">Acciones</th>
+            <th>Expira</th>
+            <th style="width:150px">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {# BACKEND:
-             - Provee 'history' como iterable de objetos/dicts con:
-               item.id, item.name, item.valid ('activo'/'inactivo' o bool),
-               item.expiration_date (date/datetime o str formateado)
-             - Si implementas paginación, pásala también aquí.
-          #}
           {% for item in history %}
           <tr>
-            <td class="fw-semibold">{{ item.id }}</td>
-            <td>{{ item.name }}</td>
+            <td class="small">{{ item.id }}</td>
+            <td class="small">{{ item.name }}</td>
+            <!-- <td class="small">{{ item.email }}</td> -->
+            <!-- <td class="small">{{ item.direccion }}</td> -->
+            <!-- <td class="small">{{ item.servicio or '-' }}</td> -->
             <td>
-              {% if item.valid in ['activo', True, 'True'] %}
+              {% if item.valid in ['ACTIVO', True, 'True'] %}
                 <span class="badge rounded-pill bg-success">Activo</span>
               {% else %}
                 <span class="badge rounded-pill bg-secondary">Inactivo</span>
               {% endif %}
             </td>
-            <td>
-              {# formatea como necesites en el backend; aquí un fallback simple #}
-              {{ item.expiration_date.strftime('%Y-%m-%d') }}
-            </td>
+            <td class="small">{{ item.expiration_date.strftime('%Y-%m-%d') if item.expiration_date else '-' }}</td>
             <td class="text-nowrap">
-              <!-- Visualizar -->
               <a href="{{ url_for('credenciales.verify_credentials', psp_id=item.id) }}"
-                class="btn btn-sm btn-info" title="Visualizar">
+                 class="btn btn-sm btn-info" title="Visualizar">
                 <i class="fa-solid fa-eye"></i>
               </a>
-
-
-              <!-- Editar: ajusta el endpoint cuando lo tengas listo -->
-              <form method="get" action="{{ url_for('credenciales.edit_psp', psp_id=item.id) }}" style="display:inline;">
-                <button type="submit" class="btn btn-sm btn-warning" title="Editar">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-              </form>
-
-
-              <!-- Eliminar -->
-              <form method="post"
-                    action="{{ url_for('credenciales.delete_credentials', psp_id=item.id) }}"
-                    style="display:inline;"
-                    onsubmit="return confirm('¿Estás seguro de que quieres eliminar este registro?');">
+              <a href="{{ url_for('credenciales.edit_psp', psp_id=item.id) }}"
+                 class="btn btn-sm btn-warning" title="Editar">
+                <i class="fa-solid fa-pen"></i>
+              </a>
+              <a href="{{ url_for('credenciales.qr_psp', psp_id=item.id) }}"
+                 class="btn btn-sm btn-light" title="Descargar QR">
+                <i class="fa-solid fa-qrcode"></i>
+              </a>
+              <form method="post" action="{{ url_for('credenciales.delete_credentials', psp_id=item.id) }}"
+                    style="display:inline;" onsubmit="return confirm('¿Eliminar este registro?');">
                 <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
                   <i class="fa-solid fa-trash"></i>
                 </button>
@@ -113,21 +72,11 @@
             </td>
           </tr>
           {% else %}
-          <tr>
-            <td colspan="5" class="text-center text-muted-custom">Sin registros</td>
-          </tr>
+          <tr><td colspan="8" class="text-center text-muted-custom">Sin registros</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-
-  {# BACKEND - Puntos de integración:
-     - POST del formulario superior -> crea/actualiza PSP.
-     - GET ?search=... -> filtra 'history' por ID/nombre/estado.
-     - Endpoints de acciones:
-         • credenciales.verify_credentials(psp_id)  -> ver/editar (ajusta cuando tengas vista de edición).
-         • credenciales.delete_credentials(psp_id)  -> eliminar.
-  #}
 </div>
 {% endblock %}
