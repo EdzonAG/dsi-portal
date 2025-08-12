@@ -1,23 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Editar Módulo: {{ module.title }}</h2>
-<form method="post">
-    <div class="mb-3">
+<div class="sheet">
+  <h2 class="mb-3">Editar Módulo: {{ module.title }}</h2>
+
+  <div class="panel">
+    <form method="post">
+      <div class="mb-3">
         <label class="form-label">Identificador</label>
         <input type="text" name="identifier" class="form-control" value="{{ module.identifier }}" required>
-    </div>
-    <div class="mb-3">
+      </div>
+      <div class="mb-3">
         <label class="form-label">Título</label>
         <input type="text" name="title" class="form-control" value="{{ module.title }}" required>
-    </div>
-    <div class="mb-3">
+      </div>
+      <div class="mb-3">
         <label class="form-label">Descripción</label>
-        <textarea name="description" class="form-control" required>{{ module.description }}</textarea>
-    </div>
-    <div class="mb-3">
+        <textarea name="description" class="form-control" rows="3" required>{{ module.description }}</textarea>
+      </div>
+      <div class="mb-3">
         <label class="form-label">URL Endpoint</label>
         <input type="text" name="url_endpoint" class="form-control" value="{{ module.url_endpoint }}" required>
-    </div>
-    <button type="submit" class="btn btn-success">Actualizar Módulo</button>
-</form>
+      </div>
+      <button type="submit" class="btn btn-success">Actualizar Módulo</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

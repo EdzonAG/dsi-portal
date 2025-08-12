@@ -1,23 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Crear Nuevo Módulo</h2>
-<form method="post">
-    <div class="mb-3">
+<div class="sheet">
+  <h2 class="mb-3">Crear Nuevo Módulo</h2>
+
+  <div class="panel">
+    <form method="post">
+      <div class="mb-3">
         <label class="form-label">Identificador</label>
         <input type="text" name="identifier" class="form-control" placeholder="Ej: calculator" required>
-    </div>
-    <div class="mb-3">
+      </div>
+      <div class="mb-3">
         <label class="form-label">Título</label>
         <input type="text" name="title" class="form-control" placeholder="Ej: Calculadora Básica" required>
-    </div>
-    <div class="mb-3">
+      </div>
+      <div class="mb-3">
         <label class="form-label">Descripción</label>
-        <textarea name="description" class="form-control" placeholder="Descripción del módulo" required></textarea>
-    </div>
-    <div class="mb-3">
+        <textarea name="description" class="form-control" rows="3" placeholder="Descripción del módulo" required></textarea>
+      </div>
+      <div class="mb-3">
         <label class="form-label">URL Endpoint</label>
         <input type="text" name="url_endpoint" class="form-control" placeholder="Ej: calculator.calculator_home" required>
-    </div>
-    <button type="submit" class="btn btn-success">Crear Módulo</button>
-</form>
+      </div>
+      <button type="submit" class="btn btn-success">Crear Módulo</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

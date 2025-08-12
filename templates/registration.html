@@ -1,31 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Registro de Usuario</h2>
-<form method="post" onsubmit="return validateForm()">
-  <div class="mb-3">
-    <label for="username" class="form-label">Nombre de Usuario</label>
-    <input type="text" class="form-control" name="username" id="username" required pattern="^[a-z]+$" title="El nombre de usuario solo puede contener letras minúsculas sin espacios ni caracteres especiales.">
+<div class="sheet">
+  <h2 class="mb-3">Registro de Usuario</h2>
+
+  <div class="panel">
+    <form method="post" onsubmit="return validateForm()">
+      <div class="mb-3">
+        <label for="username" class="form-label">Nombre de Usuario</label>
+        <input type="text" class="form-control" name="username" id="username" required
+               pattern="^[a-z]+$"
+               title="Solo letras minúsculas, sin espacios ni caracteres especiales.">
+        <small class="form-text">Usa únicamente letras minúsculas (ej. <code>jlopez</code>).</small>
+      </div>
+
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre Completo</label>
+        <input type="text" class="form-control" name="nombre" id="nombre" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo Electrónico</label>
+        <input type="email" class="form-control" name="email" id="email" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" name="password" id="password" required>
+        <small id="password_strength" class="form-text"></small>
+      </div>
+
+      <div class="mb-3">
+        <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+        <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
+        <small id="password_match" class="form-text"></small>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Registrarse</button>
+    </form>
   </div>
-  <div class="mb-3">
-    <label for="nombre" class="form-label">Nombre Completo</label>
-    <input type="text" class="form-control" name="nombre" id="nombre" required>
-  </div>
-  <div class="mb-3">
-    <label for="email" class="form-label">Correo Electrónico</label>
-    <input type="email" class="form-control" name="email" id="email" required>
-  </div>
-  <div class="mb-3">
-    <label for="password" class="form-label">Contraseña</label>
-    <input type="password" class="form-control" name="password" id="password" required>
-    <small id="password_strength" class="form-label"></small>
-  </div>
-  <div class="mb-3">
-    <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-    <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
-    <small id="password_match" class="form-label"></small>
-  </div>
-  <button type="submit" class="btn btn-primary">Registrarse</button>
-</form>
+</div>
+
 <script>
 function validatePasswordStrength(password) {
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -37,7 +51,7 @@ function checkPassword() {
   const confirm = document.getElementById("confirm_password").value;
   const strengthEl = document.getElementById("password_strength");
   const matchEl = document.getElementById("password_match");
-  
+
   if (password.length === 0) {
     strengthEl.textContent = "";
   } else if (!validatePasswordStrength(password)) {
@@ -47,7 +61,7 @@ function checkPassword() {
     strengthEl.textContent = "Contraseña segura.";
     strengthEl.style.color = "green";
   }
-  
+
   if (confirm.length === 0) {
     matchEl.textContent = "";
   } else if (password !== confirm) {
@@ -60,7 +74,6 @@ function checkPassword() {
 }
 
 function validateForm() {
-  // Validación del nombre de usuario: solo letras minúsculas sin espacios ni caracteres especiales
   const username = document.getElementById("username").value;
   if (!/^[a-z]+$/.test(username)) {
     alert("El nombre de usuario solo puede contener letras minúsculas sin espacios ni caracteres especiales.");

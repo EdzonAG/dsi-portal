@@ -11,88 +11,90 @@
 </head>
 <body>
   <div class="d-flex flex-column min-vh-100">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg sticky-top shadow-sm" id="main-navbar">
+
+    <!-- Navbar (azul corporativo) -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" id="main-navbar">
       <div class="container-fluid d-flex align-items-center">
-        <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
           <img src="{{ url_for('static', filename='images/logo_secomext.png') }}" alt="Logo Secomext" style="height:50px; margin-right:8px;">
         </a>
-        <!-- Botón para mostrar el menú en dispositivos móviles -->
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Mostrar navegación">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <!-- Menú de navegación -->
+
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto align-items-center">
+          <ul class="navbar-nav ms-auto align-items-center gap-2">
             {% if current_user.is_authenticated %}
               <li class="nav-item">
-                <span class="nav-link text-white">Bienvenido, {{ current_user.nombre }}</span>
+                <span class="nav-link">Bienvenido, {{ current_user.nombre }}</span>
               </li>
               {% if current_user.is_authenticated and current_user.is_admin %}
                 <li class="nav-item">
-                  <a class="nav-link text-white" href="{{ url_for('admin.admin_home') }}">Panel Administración</a>
+                  <a class="btn btn-outline-light btn-nav" href="{{ url_for('admin.admin_home') }}">
+                    <i class="fa-solid fa-sliders me-1"></i> Panel Administración
+                  </a>
                 </li>
               {% endif %}
               <li class="nav-item">
-                <a class="nav-link text-white" href="{{ url_for('auth.logout') }}">Cerrar Sesión</a>
+                <a class="btn btn-danger btn-nav" href="{{ url_for('auth.logout') }}">
+                  <i class="fa-solid fa-right-from-bracket me-1"></i> Cerrar Sesión
+                </a>
               </li>
             {% else %}
               <li class="nav-item">
-                <a class="nav-link text-white" href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+                <a class="btn btn-light btn-nav" href="{{ url_for('auth.login') }}">
+                  <i class="fa-solid fa-right-to-bracket me-1"></i> Iniciar Sesión
+                </a>
               </li>
             {% endif %}
-            <!-- Botón para cambiar de modo oscuro/claro -->
-            <li class="nav-item">
-              <button id="mode-toggle" class="btn mode-toggle-btn ms-2">
-                <i id="mode-icon" class="fa-solid fa-moon"></i>
-              </button>
-            </li>
           </ul>
         </div>
       </div>
     </nav>
-    <!-- Contenedor para alertas flash -->
-    <div class="container mt-3">
+
+    <!-- Flash alerts -->
+    <div class="container main-wrap">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
               {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
           {% endfor %}
         {% endif %}
       {% endwith %}
     </div>
 
-    <!-- Sidebar -->
+    <!-- Layout: sidebar opcional + contenido -->
     {% if show_sidebar %}
-      <div class="container-fluid flex-fill">
-        <div class="row">
-          <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
-            <div class="position-sticky pt-3">
+      <div class="container-fluid flex-fill main-wrap">
+        <div class="row g-3">
+          <nav id="sidebar" class="col-12 col-md-3 col-lg-2 sidebar">
+            <div class="position-sticky pt-1">
               <ul class="nav flex-column">
                 {% for mod in modules %}
                   {% if current_user.is_admin or mod.identifier in current_user.allowed_modules_list %}
                     <li class="nav-item">
-                      <a class="nav-link" href="{{ url_for(mod.url_endpoint) }}">{{ mod.title }}</a>
+                      <a class="nav-link {% if request.endpoint == mod.url_endpoint %}active{% endif %}"
+                         href="{{ url_for(mod.url_endpoint) }}">{{ mod.title }}</a>
                     </li>
                   {% endif %}
                 {% endfor %}
               </ul>
             </div>
           </nav>
-          <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+          <main class="col-12 col-md-9 col-lg-10 py-3">
     {% else %}
       <main class="flex-fill">
-        <div class="container mt-4">
+        <div class="container main-wrap py-4">
     {% endif %}
 
     {% block content %}{% endblock %}
 
-    {# Cierra el contenedor abierto #}
     {% if show_sidebar %}
           </main>
         </div>
@@ -103,47 +105,24 @@
     {% endif %}
 
     <!-- Footer -->
-    <footer id="main-footer" class="text-center py-3">
+    <footer id="main-footer" class="text-center py-3 mt-4">
       <small>© Servicios Electrónicos de Comercio Exterior S.A. de C.V. - Todos los derechos reservados</small>
     </footer>
   </div>
 
-  <!-- Bootstrap JS CDN (incluye Popper.js) -->
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- JavaScript para alternar modo oscuro/claro -->
+
+  <!-- Auto-cierre de alerts -->
   <script>
-    const toggleBtn = document.getElementById('mode-toggle');
-    const modeIcon = document.getElementById('mode-icon');
-    const body = document.body;
-    if (localStorage.getItem('mode') === 'dark') {
-      body.classList.add('dark-mode');
-      modeIcon.classList.remove('fa-moon');
-      modeIcon.classList.add('fa-sun');
-    }
-    toggleBtn.addEventListener('click', () => {
-      body.classList.toggle('dark-mode');
-      if (body.classList.contains('dark-mode')) {
-        modeIcon.classList.remove('fa-moon');
-        modeIcon.classList.add('fa-sun');
-        localStorage.setItem('mode', 'dark');
-      } else {
-        modeIcon.classList.remove('fa-sun');
-        modeIcon.classList.add('fa-moon');
-        localStorage.setItem('mode', 'light');
-      }
-    });
     window.setTimeout(function() {
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(function(alert) {
-      // Aplica una transición para desvanecer la alerta
-      alert.style.transition = "opacity 0.5s ease";
-      alert.style.opacity = "0";
-      // Una vez terminada la transición, elimina la alerta del DOM
-      setTimeout(function() {
-        alert.remove();
-      }, 500);
-    });
-  }, 5000);
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(function(alert) {
+        alert.style.transition = "opacity 0.5s ease";
+        alert.style.opacity = "0";
+        setTimeout(function() { alert.remove(); }, 500);
+      });
+    }, 5000);
   </script>
 </body>
 </html>

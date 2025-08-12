@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row mt-3">
-  <!-- Formulario y resultado (izquierda) -->
-  <div class="col-lg-5">
-    <a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">Volver al Menú Principal</a>
-    <h2>Password Generator EVS</h2>
+<div class="sheet sheet-wide">
+  <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3 mb-3">Volver al Menú Principal</a>
+
+  <h2 class="mb-3">Password Generator</h2>
+
+  <!-- Panel del formulario -->
+  <div class="panel mb-4">
     <form method="post">
       <div class="mb-3">
-        <label for="username" class="form-label">Nombre de usuario:</label>
+        <label for="username" class="form-label">Nombre de usuario/cuenta:</label>
         <input type="text" name="username" id="username" class="form-control"
                placeholder="Introduce el nombre de usuario" required>
       </div>
@@ -15,23 +17,19 @@
     </form>
 
     {% if generated_password and password_hash %}
-    <div class="mt-4 p-3 border rounded bg-light">
-      <h5>Resultado</h5>
-      <p>
+    <div class="mt-4 p-3 panel">
+      <h5 class="mb-2">Resultado</h5>
+      <p class="mb-2">
         <strong>Contraseña:</strong>
         <code id="plain-password">{{ generated_password }}</code>
-        <button class="btn btn-sm btn-outline-secondary ms-2"
-                onclick="copyText('{{ generated_password }}')"
-                title="Copiar contraseña">
+        <button class="btn btn-sm btn-secondary ms-2" onclick="copyText('{{ generated_password }}')" title="Copiar contraseña">
           <i class="fa-regular fa-copy"></i>
         </button>
       </p>
-      <p>
+      <p class="mb-0">
         <strong>Hash:</strong>
         <code id="hash-password">{{ password_hash }}</code>
-        <button class="btn btn-sm btn-outline-secondary ms-2"
-                onclick="copyText('{{ password_hash }}')"
-                title="Copiar hash">
+        <button class="btn btn-sm btn-secondary ms-2" onclick="copyText('{{ password_hash }}')" title="Copiar hash">
           <i class="fa-regular fa-copy"></i>
         </button>
       </p>
@@ -39,22 +37,19 @@
     {% endif %}
   </div>
 
-  <!-- Historial y búsqueda (derecha) -->
-  <div class="col-lg-7">
-    <h4>Últimas Contraseñas Generadas</h4>
-
-    <!-- Búsqueda por usuario -->
-    <form method="get" class="d-flex mb-3">
-      <input type="text"
-             name="search"
-             value="{{ search }}"
-             class="form-control me-2"
+  <!-- Historial -->
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <h4 class="mb-0">Últimas Contraseñas Generadas</h4>
+    <form method="get" class="d-flex gap-2">
+      <input type="text" name="search" value="{{ search }}" class="form-control"
              placeholder="Buscar por usuario">
-      <button type="submit" class="btn btn-outline-primary">Buscar</button>
+      <button type="submit" class="btn btn-secondary">Buscar</button>
     </form>
+  </div>
 
+  <div class="table-wrap">
     <div class="table-responsive">
-      <table class="table table-sm table-bordered table-striped table-hover align-middle">
+      <table class="table table-sm table-bordered table-striped table-hover align-middle mb-0">
         <thead>
           <tr>
             <th>Fecha</th>
@@ -67,29 +62,24 @@
         <tbody>
           {% for item in history %}
           <tr>
-            <td>{{ item.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-            <td>{{ item.username }}</td>
+            <td>{{ item.created_at.strftime('%y-%m-%d %H:%M') }}</td>
+            <td><span class="truncate" title="{{ item.username }}">{{ item.username }}</span></td>
             <td>
               <span class="truncate" title="{{ item.password_plain }}">{{ item.password_plain }}</span>
-              <button class="btn btn-sm btn-outline-secondary ms-2"
-                      onclick="copyText('{{ item.password_plain }}')"
-                      title="Copiar contraseña">
+              <button class="btn btn-sm btn-secondary ms-2" onclick="copyText('{{ item.password_plain }}')" title="Copiar contraseña">
                 <i class="fa-regular fa-copy"></i>
               </button>
             </td>
             <td>
               <span class="truncate" title="{{ item.password_hash }}">{{ item.password_hash }}</span>
-              <button class="btn btn-sm btn-outline-secondary ms-2"
-                      onclick="copyText('{{ item.password_hash }}')"
-                      title="Copiar hash">
+              <button class="btn btn-sm btn-secondary ms-2" onclick="copyText('{{ item.password_hash }}')" title="Copiar hash">
                 <i class="fa-regular fa-copy"></i>
               </button>
             </td>
             <td>
               <form method="post"
                     action="{{ url_for('password_generator.delete_password_entry', entry_id=item.id, search=search) }}"
-                    style="display:inline;"
-                    onsubmit="return confirm('¿Eliminar este registro?');">
+                    style="display:inline;" onsubmit="return confirm('¿Eliminar este registro?');">
                 <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
                   <i class="fa-solid fa-trash"></i>
                 </button>
@@ -101,38 +91,27 @@
       </table>
     </div>
   </div>
+
+  <style>
+    .truncate{
+      display:inline-block; max-width:240px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:middle;
+    }
+    @media (max-width: 768px){
+      .truncate{ max-width:140px; }
+    }
+  </style>
 </div>
 
-<!-- Copiar al portapapeles -->
 <script>
-  function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-success position-fixed top-50 start-50 translate-middle';
-      alertDiv.style.zIndex = 2000;
-      alertDiv.textContent = 'Copiado al portapapeles';
+  function copyText(text){
+    navigator.clipboard.writeText(text).then(()=>{
+      const alertDiv=document.createElement('div');
+      alertDiv.className='alert alert-success position-fixed top-50 start-50 translate-middle';
+      alertDiv.style.zIndex=2000; alertDiv.textContent='Copiado al portapapeles';
       document.body.appendChild(alertDiv);
-      setTimeout(() => alertDiv.remove(), 1500);
-    }).catch(err => {
-      console.error('Error copiando al portapapeles', err);
-    });
+      setTimeout(()=>alertDiv.remove(),1500);
+    }).catch(err=>console.error('Error copiando al portapapeles',err));
   }
 </script>
-
-<!-- Estilos para truncar -->
-<style>
-  .truncate {
-    display: inline-block;
-    max-width: 150px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-  }
-  @media (max-width: 768px) {
-    .truncate {
-      max-width: 100px;
-    }
-  }
-</style>
 {% endblock %}

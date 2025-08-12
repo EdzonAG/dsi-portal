@@ -1,41 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Crear Nuevo Usuario</h2>
-<form method="post">
-  <div class="mb-3">
-    <label class="form-label">Nombre de Usuario</label>
-    <input type="text" name="username" class="form-control" placeholder="Nombre de usuario" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Nombre Completo</label>
-    <input type="text" name="nombre" class="form-control" placeholder="Nombre completo" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Correo Electrónico</label>
-    <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Contraseña</label>
-    <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Créditos</label>
-    <input type="number" name="creditos" class="form-control" placeholder="Créditos" value="0" min="-1" required>
-  </div>
-  <div class="mb-3">
-    <p class="form-label">Módulos Permitidos</p>
-    {% for mod in modules %}
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="allowed_modules" value="{{ mod.identifier }}" id="{{ mod.identifier }}" {% if mod.identifier == "tutorial" %}checked{% endif %}>
-        <label class="form-check-label" for="{{ mod.identifier }}">{{ mod.title }}</label>
+<div class="sheet">
+  <h2 class="mb-3">Crear Nuevo Usuario</h2>
+
+  <div class="panel">
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label">Nombre de Usuario</label>
+        <input type="text" name="username" class="form-control" placeholder="Nombre de usuario" required>
       </div>
-    {% endfor %}
-    <small class="form-label">Selecciona los módulos a los que el usuario tendrá acceso.</small>
+      <div class="mb-3">
+        <label class="form-label">Nombre Completo</label>
+        <input type="text" name="nombre" class="form-control" placeholder="Nombre completo" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Correo Electrónico</label>
+        <input type="email" name="email" class="form-control" placeholder="Correo electrónico" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input type="password" name="password" class="form-control" placeholder="Contraseña" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Créditos</label>
+        <input type="number" name="creditos" class="form-control" placeholder="Créditos" value="0" min="-1" required>
+      </div>
+      <div class="mb-3">
+        <p class="form-label">Módulos Permitidos</p>
+        {% for mod in modules %}
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="allowed_modules" value="{{ mod.identifier }}" id="{{ mod.identifier }}" {% if mod.identifier == "tutorial" %}checked{% endif %}>
+            <label class="form-check-label" for="{{ mod.identifier }}">{{ mod.title }}</label>
+          </div>
+        {% endfor %}
+        <small class="form-text">Selecciona los módulos a los que el usuario tendrá acceso.</small>
+      </div>
+      <div class="mb-3 form-check">
+        <input type="checkbox" name="is_admin" class="form-check-input" id="is_admin">
+        <label class="form-check-label" for="is_admin">Administrador</label>
+      </div>
+      <button type="submit" class="btn btn-success">Crear Usuario</button>
+    </form>
   </div>
-  <div class="mb-3 form-check">
-    <input type="checkbox" name="is_admin" class="form-check-input" id="is_admin">
-    <label class="form-check-label" for="is_admin">Administrador</label>
-  </div>
-  <button type="submit" class="btn btn-success">Crear Usuario</button>
-</form>
+</div>
 {% endblock %}

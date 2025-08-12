@@ -1,193 +1,365 @@
-/* ===============================
-   General Styles
-   =============================== */
-   body {
-    background-color: #f8f9fa;
-    color: #212529;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
+/* =========================================================
+   Tema oscuro único + utilidades de layout
+   ========================================================= */
+:root{
+  --bg: #0b0f14;
+  --bg-2: #0b1118;
+  --panel: #0e1621;
+  --card: #111b29;
+  --txt: #e6f1ff;
+  --muted: #9ab0c6;
+  --accent: #35c1e0;
+  --accent-2: #6dc7ff;
+  --ring: #2de3d3;
+  --brand-azul: #00B0F6;
+
+  --border-alpha: rgba(77,114,159,.25);
+  --border-alpha-2: rgba(77,114,159,.18);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+
+  --shadow-1: 0 8px 24px rgba(0,0,0,.35);
+  --shadow-2: 0 10px 30px rgba(0,0,0,.38);
+}
+
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
+  line-height:1.4;
+  color: var(--txt);
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(53,224,161,.12), transparent 60%),
+    radial-gradient(800px 500px at 90% 20%, rgba(109,199,255,.10), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+}
+
+*{
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease, transform .15s ease;
 }
 
 /* ===============================
-   Dark Mode General
+   Navbar (mantener #00B0F6)
    =============================== */
-.dark-mode {
-    background-color: #212529;
-    color: #e0e0e0;
+#main-navbar{
+  background: var(--brand-azul) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+#main-navbar .navbar-brand img{ max-height:46px }
+#main-navbar .nav-link{ color:#ffffff; }
+#main-navbar .nav-link:hover{ color:#f1fff9; text-decoration:none; }
+#main-navbar .navbar-toggler{ border-color: rgba(255,255,255,.65); }
+#main-navbar .navbar-toggler-icon{ filter: invert(100%); }
+
+/* ===============================
+   Layout helpers (centrado/narrow)
+   =============================== */
+.main-wrap{ max-width: 1200px; margin: 22px auto 0; padding: 0 16px; }
+
+/* .sheet: contenedor angosto centrado (para formularios/páginas de detalle) */
+.sheet{
+  max-width: 820px;       /* ancho objetivo en desktop */
+  margin: 0 auto;         /* centrado */
+  text-align: left;       /* mantener alineación a la izquierda */
+}
+
+/* Ancho más amplio solo cuando se necesite (tablas grandes, listados) */
+/* .sheet-wide { max-width: 1100px; }
+@media (max-width: 1200px) { .sheet-wide { max-width: 96%; } } */
+
+
+/* .panel: bloque estilo “glass panel” */
+.panel{
+  background: rgba(17,27,41,.6);
+  border: 1px solid var(--border-alpha);
+  border-radius: var(--radius);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-1);
+  padding: 16px;
+}
+
+/* .table-wrap: panel específico para tablas con scroll responsivo */
+.table-wrap{
+  background: linear-gradient(180deg, rgba(22,34,52,.92), rgba(14,22,33,.92));
+  border: 1px solid var(--border-alpha-2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  padding: 10px;
 }
 
 /* ===============================
-   Navbar Styles
+   Sidebar
    =============================== */
-#main-navbar {
-    background-color: #00B0F6;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.sidebar{
+  padding: 16px;
+  background: rgba(17,27,41,.6);
+  border: 1px solid var(--border-alpha);
+  border-radius: var(--radius);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-1);
+  min-height: calc(100vh - 56px - 72px);
 }
-#main-navbar .navbar-brand img {
-    /* Asegúrate de que el logo se vea bien */
-    max-height: 45px;
+.sidebar .nav-link{
+  display:block; color: var(--txt); font-size:.98rem;
+  padding:.55rem .75rem; border-radius:10px; border:1px solid transparent;
 }
-.dark-mode #main-navbar {
-    background-color: #00B0F6;
+.sidebar .nav-link:hover{ background:#0f1826; border-color:var(--border-alpha); }
+.sidebar .nav-link.active{
+  color:#d3e6ff; background: linear-gradient(180deg, rgba(22,34,52,.9), rgba(14,22,33,.92));
+  border:1px solid var(--ring);
+  box-shadow:0 0 0 3px rgba(45,227,211,.18), inset 0 0 40px rgba(53,224,161,.10);
 }
 
 /* ===============================
-   Botón de Cambio de Modo
+   Cards
    =============================== */
-.mode-toggle-btn {
-    background-color: #FFC107;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
+.card{
+  background: linear-gradient(180deg, rgba(22,34,52,.92), rgba(14,22,33,.92));
+  border: 1px solid var(--border-alpha-2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  color: var(--txt);
 }
-.mode-toggle-btn:hover {
-    background-color: #e0a800;
-}
-.mode-toggle-btn i {
-    color: #292929;
-    font-size: 1.2rem;
-}
+.card:hover{ transform: translateY(-2px); }
+.card .card-title{ color:#d3e6ff; font-weight:600; margin-bottom:.4rem; }
+.card .card-text{ color: var(--muted); }
 
 /* ===============================
-   Botones Modernos
-   =============================== */
-/* Puedes sobreescribir los botones primarios de Bootstrap */
-.btn-primary {
-    background-color: #00B0F6;
-    border: none;
-    border-radius: 6px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.btn-primary:hover {
-    background-color: #0091c2;
-    transform: translateY(-2px);
-}
-.btn-success {
-    background-color: #28a745;
-    border: none;
-    border-radius: 6px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.btn-success:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-}
-.btn-warning {
-    background-color: #ffc107;
-    border: none;
-    border-radius: 6px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.btn-warning:hover {
-    background-color: #e0a800;
-    transform: translateY(-2px);
-}
-.btn-danger {
-    background-color: #dc3545;
-    border: none;
-    border-radius: 6px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.btn-danger:hover {
-    background-color: #c82333;
-    transform: translateY(-2px);
-}
-
-/* ===============================
-   Sidebar Styles
-   =============================== */
-.sidebar {
-    padding: 1rem;
-    border-right: 1px solid #dee2e6;
-    background-color: #f8f9fa;
-}
-.sidebar .nav-link {
-    font-size: 1rem;
-    color: #212529;
-    transition: color 0.3s ease;
-}
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
-    color: #00B0F6;
-}
-.dark-mode .sidebar {
-    border-right: 1px solid #444;
-    background-color: #343a40;
-}
-.dark-mode .sidebar .nav-link {
-    color: #e0e0e0;
-}
-.dark-mode .sidebar .nav-link:hover,
-.dark-mode .sidebar .nav-link.active {
-    color: #00B0F6;
-}
-
-/* ===============================
-   Table Styles
+   Tablas (Bootstrap .table) — Dark fix
    =============================== */
 .table {
-    --bs-table-bg: #ffffff;
-    --bs-table-color: #212529;
+  /* Variables de Bootstrap para que TODAS las variantes respeten el dark */
+  --bs-table-color: var(--txt);
+  --bs-table-bg: #0f1826;
+  --bs-table-border-color: var(--border-alpha);
+  --bs-table-striped-color: var(--txt);
+  --bs-table-striped-bg: rgba(255,255,255,.04);
+  --bs-table-hover-color: var(--txt);
+  --bs-table-hover-bg: rgba(109,199,255,.08);
+  --bs-table-active-color: var(--txt);
+  --bs-table-active-bg: rgba(255,255,255,.06);
+
+  color: var(--txt);
+  background: var(--bs-table-bg);
+  border-color: var(--bs-table-border-color);
+  border-radius: 12px;
+  overflow: hidden;
 }
-.dark-mode .table {
-    --bs-table-bg: #1e1e1e;
-    --bs-table-color: #e0e0e0;
-    --bs-table-border-color: #ffffff;
+
+/* Forzar que cada celda use el bg/texto definido por las variables */
+.table > :not(caption) > * > * {
+  background-color: var(--bs-table-bg) !important;
+  color: var(--bs-table-color) !important;
+  border-color: var(--bs-table-border-color) !important;
+}
+
+/* Encabezado con ligero contraste */
+.table thead th {
+  color: #d3e6ff;
+  background-color: rgba(109,199,255,.06) !important;
+  border-bottom: 1px solid var(--bs-table-border-color) !important;
+}
+
+/* Opcional: mejorar el borde exterior cuando se usa .table-bordered */
+.table-bordered {
+  border: 1px solid var(--bs-table-border-color) !important;
+}
+
+/* Zebra y hover (por si alguna clase los reescribe) */
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: var(--bs-table-striped-bg) !important;
+  color: var(--bs-table-striped-color) !important;
+}
+.table-hover > tbody > tr:hover > * {
+  background-color: var(--bs-table-hover-bg) !important;
+  color: var(--bs-table-hover-color) !important;
+}
+
+
+/* ===============================
+   Formularios
+   =============================== */
+.form-label{ color:#dbe8ff; }
+.form-text, .text-muted, .text-secondary{ color: var(--muted) !important; }
+.form-control, .form-select{
+  background:#0f1826; color: var(--txt);
+  border-radius: 12px; border:1px solid var(--border-alpha);
+}
+.form-control:disabled{ background: #172334; color: #cfe0ff; opacity: 1; }
+.form-control:focus, .form-select:focus{
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(45,227,211,.18);
+  background:#102035; color: var(--txt);
+}
+.form-check-input{
+  background-color:#0f1826; border:1px solid var(--border-alpha);
+}
+.form-check-input:checked{
+  background-color: var(--brand-azul); border-color: var(--brand-azul);
+}
+
+/* Forzar utilidades de Bootstrap que rompen el dark */
+.bg-light{ background:#0f1826 !important; color: var(--txt) !important; }
+
+.form-control::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.form-control::-webkit-input-placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.form-control::-moz-placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.form-control:-ms-input-placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 /* ===============================
-   Card Styles
+   Botones
    =============================== */
-.card {
-    background-color: #ffffff;
-    color: #212529;
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
-    transition: transform 0.2s ease;
+.btn{
+  border-radius: 12px; border:1px solid transparent; font-weight:600;
 }
-.card:hover {
-    transform: translateY(-3px);
+.btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 30px rgba(0,0,0,.28); }
+
+.btn-primary{ background: var(--brand-azul); border:none; color:#071018; }
+.btn-primary:hover{ background:#0091c2; color:#06131a; }
+
+.btn-secondary{ background:#1a2a42; color:#d7e9ff; border:1px solid var(--border-alpha); }
+.btn-secondary:hover{ background:#1e334f; }
+
+.btn-success{ background:#28a745; border:none; }
+.btn-success:hover{ background:#218838; }
+
+.btn-warning{ background:#ffc107; color:#212529; border:none; }
+.btn-warning:hover{ background:#e0a800; }
+
+.btn-danger{ background:#dc3545; border:none; }
+.btn-danger:hover{ background:#c82333; }
+
+/* Botones dentro de la navbar */
+#main-navbar .btn-nav{
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
 }
-.dark-mode .card {
-    background-color: #2a2a2a;
-    color: #e0e0e0;
+#main-navbar .btn-nav:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.25);
+}
+
+/* Ajuste fino para btn-light sobre navbar azul */
+#main-navbar .btn-light.btn-nav{
+  color: #0b1118; /* texto oscuro para buen contraste */
+}
+
+
+/* ===============================
+   Alerts
+   =============================== */
+.alert{
+  border-radius: 12px; border:1px solid var(--border-alpha);
+  background:#0f1826; color:#dbe8ff; box-shadow: var(--shadow-1);
 }
 
 /* ===============================
-   Footer Styles
+   Footer
    =============================== */
-#main-footer {
-    background-color: #f1f1f1;
-    color: #212529;
-    font-size: 0.9rem;
-    width: 100%;
-}
-.dark-mode #main-footer {
-    background-color: #333;
-    color: #e0e0e0;
+#main-footer{
+  background:#0e1621; color: var(--muted);
+  font-size:.92rem; width:100%;
+  border-top:1px solid var(--border-alpha);
 }
 
-/* ===============================
-   Responsive Adjustments
-   =============================== */
-
-/* Form controls */
-.form-control {
-    box-sizing: border-box;
-    padding: 8px 12px;
+/* Responsivo */
+@media (max-width: 768px){
+  .sidebar{ padding: 12px; min-height: auto; }
+  .sheet{ max-width: 100%; }
 }
 
-@media (max-width: 768px) {
-    .sidebar {
-        padding: 0.5rem;
-    }
-    .sidebar .nav-link {
-        font-size: 0.9rem;
-    }
+/* ===== Uploader / Drop Area (global) ===== */
+.drop-area{
+  border: 1.5px dashed var(--border-alpha);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  background: #0f1826;
+  color: var(--muted);
+  transition: background-color .25s, border-color .25s, box-shadow .25s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.drop-area.highlight{
+  background-color: #102035;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(45,227,211,.18);
+}
+.drop-area input[type="file"]{ display:none; }
+#preview img, #preview video{ max-width:100%; max-height:220px; display:block; margin:8px auto 0; border-radius:10px; }
+#preview audio{ display:block; margin:8px auto 0; }
+#preview p{ margin:6px 0 0; color: var(--muted); }
+
+/* ===== Utilidad para centrar en viewport ===== */
+.center-viewport{
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Tarjeta de estado (verify) ===== */
+.status-card{
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(22,34,52,.92), rgba(14,22,33,.92));
+  border: 1px solid var(--border-alpha-2);
+  border-radius: 16px;
+  box-shadow: var(--shadow-2);
+  padding: 22px;
+}
+.status-card h3{ margin: 6px 0 4px; }
+.status-card .sub{ color: var(--muted); font-size: .95rem; }
+
+.status-icon{
+  width: 72px; height: 72px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 34px; margin-bottom: 10px;
+}
+
+.status-pill{ display:inline-block; padding:6px 12px; border-radius: 999px; font-weight: 700; }
+
+/* Activo */
+.status-active .status-icon{
+  background: linear-gradient(90deg, #16da86 0%, #48f0ff 100%);
+  color: #06131a;
+  box-shadow: 0 0 0 3px rgba(45,227,211,.28), inset 0 0 40px rgba(53,224,161,.18);
+}
+.status-active .status-pill{
+  background: rgba(22,201,141,.18);
+  color: #bfffea;
+  border: 1px solid rgba(22,201,141,.45);
+}
+
+/* Inactivo / inválido */
+.status-inactive .status-icon{
+  background: linear-gradient(90deg, #ff5a6d 0%, #ff9f6e 100%);
+  color: #1a0b0b;
+  box-shadow: 0 0 0 3px rgba(255,90,109,.25), inset 0 0 40px rgba(255,90,109,.15);
+}
+.status-inactive .status-pill{
+  background: rgba(255,90,109,.18);
+  color: #ffd7dc;
+  border: 1px solid rgba(255,90,109,.45);
 }

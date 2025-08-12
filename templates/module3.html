@@ -1,170 +1,108 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="sheet">
+  <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3 mb-3">Volver al Menú Principal</a>
 
-<div class="mb-3">
-  <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Volver al Menú Principal</a>
+  <h2 class="mb-3">Generador de Minutas con IA</h2>
+
+  <div class="panel">
+    <form id="minutaForm" method="post" enctype="multipart/form-data">
+      <!-- Créditos y fuente -->
+      <div class="mb-3">
+        <label><strong>Créditos Disponibles: <span id="creditos">{{ user.creditos }}</span></strong></label><br>
+        <label class="form-label mt-2">Selecciona la fuente de la información:</label>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="video" name="opcion" value="video" required>
+          <label class="form-check-label" for="video">Video</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="audio" name="opcion" value="audio">
+          <label class="form-check-label" for="audio">Audio</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="transcripcion" name="opcion" value="transcripcion">
+          <label class="form-check-label" for="transcripcion">Transcripción (.vtt)</label>
+        </div>
+      </div>
+
+      <!-- Archivo -->
+      <div class="mb-3">
+        <label for="archivo" class="form-label">Archivo (requerido):</label>
+        <div id="drop-area" class="drop-area">
+          <p id="drop-text" class="mb-2">Arrastra y suelta tu archivo aquí o haz clic para seleccionarlo</p>
+          <input type="file" name="archivo" id="archivo" accept="audio/*,video/*,.vtt" required>
+          <button type="button" id="remove-btn" class="btn btn-sm btn-danger mt-2" style="display:none;">Remover</button>
+          <div id="preview"></div>
+        </div>
+      </div>
+
+      <button type="submit" id="generate-btn" class="btn btn-primary"
+              onclick="return confirm('¿Deseas Continuar? La generación de minutas tomará un crédito de tu cuenta.');">
+        Generar Minuta
+      </button>
+    </form>
+  </div>
 </div>
 
-<h2>Generador de Minutas con IA</h2>
-
-<form id="minutaForm" method="post" enctype="multipart/form-data">
-  <!-- Menú de opciones: Radio buttons -->
-  <div class="mb-3">
-    <label><strong>Creditos Disponibles: <span id="creditos">{{ user.creditos }}</span></strong></label> <br>
-    <label class="form-label mt-2">Selecciona la fuente de la información:</label>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" id="video" name="opcion" value="video" required>
-      <label class="form-check-label" for="video">Video</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" id="audio" name="opcion" value="audio">
-      <label class="form-check-label" for="audio">Audio</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" id="transcripcion" name="opcion" value="transcripcion">
-      <label class="form-check-label" for="transcripcion">Transcripción (.vtt)</label>
-    </div>
-  </div>
-
-  <!-- Área para archivo: Drop Area (obligatorio) -->
-  <div class="mb-3">
-    <label for="archivo" class="form-label">Archivo (requerido):</label>
-    <div id="drop-area" class="drop-area">
-      <p id="drop-text">Arrastra y suelta tu archivo aquí o haz clic para seleccionarlo</p>
-      <!-- Se marca como required para forzar la subida de un archivo -->
-      <input type="file" name="archivo" id="archivo" accept="audio/*,video/*,.vtt" required>
-      <!-- Botón de remover, inicialmente oculto -->
-      <button type="button" id="remove-btn" class="btn btn-sm btn-danger mt-2" style="display:none;">Remover</button>
-    </div>
-  </div>
-
-  <button type="submit" id="generate-btn" class="btn btn-primary" onclick="return confirm('¿Deseas Continuar? La generación de minutas tomará un crédito de tu cuenta.');">Generar Minuta</button>
-</form>
-
 <script>
-  // -------- DRAG & DROP -------------
   const dropArea = document.getElementById('drop-area');
   const fileInput = document.getElementById('archivo');
   const removeBtn = document.getElementById('remove-btn');
   const generateBtn = document.getElementById('generate-btn');
   const form = document.getElementById('minutaForm');
 
-  // Prevenir comportamiento por defecto en drag & drop
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, preventDefaults, false);
-    document.body.addEventListener(eventName, preventDefaults, false);
+  ['dragenter','dragover','dragleave','drop'].forEach(ev=>{
+    dropArea.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, false);
+    document.body.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, false);
   });
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  // Resaltar el área al arrastrar
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+  ['dragenter','dragover'].forEach(ev=>{
+    dropArea.addEventListener(ev, ()=> dropArea.classList.add('highlight'), false);
   });
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+  ['dragleave','drop'].forEach(ev=>{
+    dropArea.addEventListener(ev, ()=> dropArea.classList.remove('highlight'), false);
   });
 
-  // Manejar archivos soltados
-  dropArea.addEventListener('drop', (e) => {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    fileInput.files = files;
+  dropArea.addEventListener('drop', e=>{
+    fileInput.files = e.dataTransfer.files;
     handleFiles();
   });
-
-  // Permitir clic en el área para abrir el selector
-  dropArea.addEventListener('click', () => fileInput.click());
+  dropArea.addEventListener('click', ()=> fileInput.click());
   fileInput.addEventListener('change', handleFiles);
 
-  function handleFiles() {
+  function handleFiles(){
     const files = fileInput.files;
-    if (files && files[0]) {
+    if(files && files[0]){
       const file = files[0];
       const reader = new FileReader();
-      reader.onload = function(e) {
-        let previewContainer = document.getElementById('preview');
-        if (!previewContainer) {
-          previewContainer = document.createElement('div');
-          previewContainer.id = 'preview';
-          dropArea.appendChild(previewContainer);
+      reader.onload = e=>{
+        const preview = document.getElementById('preview');
+        let content = '';
+        if(file.name.endsWith('.vtt')){
+          content = `<p>Archivo de transcripción: ${file.name}</p>`;
+        }else if(file.type.startsWith('video/')){
+          content = `<video controls><source src="${e.target.result}" type="${file.type}"></video><p>${file.name}</p>`;
+        }else if(file.type.startsWith('audio/')){
+          content = `<audio controls><source src="${e.target.result}" type="${file.type}"></audio><p>${file.name}</p>`;
+        }else{
+          content = `<p>${file.name}</p>`;
         }
-        let previewContent = '';
-        if (file.name.endsWith('.vtt')) {
-          previewContent = `<br><p>Archivo de transcripción: ${file.name}</p>`;
-        } else if (file.type.startsWith('image/')) {
-          previewContent = `<br><img src="${e.target.result}" alt="${file.name}" style="max-width:100%; max-height:200px; display:block; margin:auto;">`;
-        } else if (file.type.startsWith('video/')) {
-          previewContent = `<br><video controls style="max-width:100%; max-height:200px; display:block; margin:auto;">
-                              <source src="${e.target.result}" type="${file.type}">
-                              Tu navegador no soporta video.
-                            </video>`;
-        } else if (file.type.startsWith('audio/')) {
-          previewContent = `<br><audio controls style="display:block; margin:auto;">
-                              <source src="${e.target.result}" type="${file.type}">
-                              Tu navegador no soporta audio.
-                            </audio>`;
-        } else {
-          previewContent = `<br><p>${file.name}</p>`;
-        }
-        previewContainer.innerHTML = previewContent + `<p>${file.name}</p>`;
+        preview.innerHTML = content;
         removeBtn.style.display = 'inline-block';
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // Botón de remover archivo
-  removeBtn.addEventListener('click', (e) => {
+  removeBtn.addEventListener('click', e=>{
     e.stopPropagation();
     fileInput.value = "";
-    const previewContainer = document.getElementById('preview');
-    if (previewContainer) {
-      previewContainer.innerHTML = "";
-    }
+    document.getElementById('preview').innerHTML = "";
     removeBtn.style.display = 'none';
   });
 
-  // -------- AL ENVIAR FORMULARIO -------------
-  // Deshabilitar botón y mostrar "Generando..."
-  form.addEventListener('submit', function() {
+  form.addEventListener('submit', function(){
     generateBtn.disabled = true;
     generateBtn.innerText = "Generando, por favor espere...";
   });
 </script>
-
-<style>
-  .drop-area {
-    border: 2px dashed #ccc;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-    width: 35%;
-    box-sizing: border-box;
-  }
-  .drop-area.highlight {
-    background-color: #f0f8ff;
-    border-color: #00B0F6;
-  }
-  .drop-area input[type="file"] {
-    display: none;
-  }
-  @media (max-width: 768px) {
-    .drop-area {
-      width: 98%;
-    }
-  }
-</style>
-
-<!-- Si existe el parámetro "download" en la URL, se fuerza la descarga automáticamente -->
-{% if request.args.get('download') %}
-<script>
-  window.location.href = "{{ url_for('minutas.download_minuta', filename=request.args.get('download')) }}";
-</script>
-{% endif %}
-
 {% endblock %}

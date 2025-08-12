@@ -1,86 +1,85 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="mb-3">
+<div class="sheet">
+  <div class="mb-3">
     <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al Menú Principal</a>
-</div>
-<h2>Panel de Administración</h2>
+  </div>
 
-<!-- Sección de Usuarios -->
-<h3>Usuarios</h3>
-<a href="{{ url_for('admin.create_user') }}" class="btn btn-success mb-3">Crear Nuevo Usuario</a>
-<div class="table-responsive">
-  <table class="table table-bordered table-striped table-hover">
-      <thead>
-          <tr>
-              <th>ID</th>
-              <th>Usuario</th>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Admin</th>
-              <th>Módulos</th>
-              <th>Suspendido</th>
-              <th>Créditos</th>
-              <th>Acciones</th>
-          </tr>
-      </thead>
-      <tbody>
-          {% for user in users %}
-          <tr>
-              <td>{{ user.id }}</td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.nombre }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ "Sí" if user.is_admin else "No" }}</td>
-              <td>{{ user.allowed_modules_list | join(", ") }}</td>
-              <td>{{ "Sí" if user.suspended else "No" }}</td>
-              <td>{{ user.creditos }}</td>
-              <td>
-                  <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm">Editar</a>
-                  <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro?');">
-                      <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                  </form>
-              </td>
-          </tr>
-          {% endfor %}
-      </tbody>
-  </table>
-</div>
+  <h2 class="mb-1">Panel de Administración</h2>
 
-<hr>
-{% if current_user.is_authenticated and current_user.username == 'admin' %}
-<!-- Sección de Módulos -->
-<h3>Módulos</h3>
-<a href="{{ url_for('admin.create_module') }}" class="btn btn-success mb-3">Crear Nuevo Módulo</a>
-<div class="table-responsive">
-    <table class="table table-bordered table-striped table-hover">
+  <!-- Usuarios -->
+  <div class="d-flex align-items-center justify-content-between mt-3 mb-2">
+    <h3 class="mb-0">Usuarios</h3>
+    <a href="{{ url_for('admin.create_user') }}" class="btn btn-success">Crear Nuevo Usuario</a>
+  </div>
+
+  <div class="table-wrap mb-4">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover align-middle mb-0">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Identificador</th>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>URL Endpoint</th>
-                <th>Acciones</th>
-            </tr>
+          <tr>
+            <th>ID</th><th>Usuario</th><th>Nombre</th>
+            <th>Admin</th><th>Módulos</th><th>Suspendido</th><th>Créditos</th><th>Acciones</th>
+          </tr>
         </thead>
         <tbody>
-            {% for mod in modules %}
-            <tr>
-                <td>{{ mod.id }}</td>
-                <td>{{ mod.identifier }}</td>
-                <td>{{ mod.title }}</td>
-                <td>{{ mod.description }}</td>
-                <td>{{ mod.url_endpoint }}</td>
-                <td>
-                    <a href="{{ url_for('admin.edit_module', module_id=mod.id) }}" class="btn btn-warning btn-sm">Editar</a>
-                    <form action="{{ url_for('admin.delete_module', module_id=mod.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este módulo?');">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
+          {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.nombre }}</td>
+            <!-- <td>{{ user.email }}</td> -->
+            <td>{{ "Sí" if user.is_admin else "No" }}</td>
+            <td>{{ user.allowed_modules_list | join(", ") }}</td>
+            <td>{{ "Sí" if user.suspended else "No" }}</td>
+            <td>{{ user.creditos }}</td>
+            <td class="text-nowrap">
+              <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
+              <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro?');">
+                <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
+
+  {% if current_user.is_authenticated and current_user.username == 'admin' %}
+  <!-- Módulos -->
+  <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+    <h3 class="mb-0">Módulos</h3>
+    <a href="{{ url_for('admin.create_module') }}" class="btn btn-success">Crear Nuevo Módulo</a>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th><th>Identificador</th><th>Título</th><th>Descripción</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mod in modules %}
+          <tr>
+            <td>{{ mod.id }}</td>
+            <td>{{ mod.identifier }}</td>
+            <td>{{ mod.title }}</td>
+            <td>{{ mod.description }}</td>
+            <td class="text-nowrap">
+              <a href="{{ url_for('admin.edit_module', module_id=mod.id) }}" class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
+              <form action="{{ url_for('admin.delete_module', module_id=mod.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este módulo?');">
+                <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
 </div>
-{% endif %}
 {% endblock %}

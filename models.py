@@ -116,3 +116,11 @@ class GeneratedPassword(db.Model):
     password_plain = db.Column(db.String(128), nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    
+    
+class PSPs(db.Model):
+    __tablename__ = 'credentials'
+    id = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    valid = db.Column(db.Boolean, nullable=False)
+    expiration_date = db.Column(db.DateTime, nullable=True)

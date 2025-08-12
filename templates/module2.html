@@ -1,80 +1,82 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="mb-3">
+<div class="sheet">
+  <div class="mb-3">
     <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Volver al Menú Principal</a>
-</div>
-<h2>Token Manager</h2>
-<form method="post" enctype="multipart/form-data">
+  </div>
 
-    <div class="mb-3">
-        <label for="facebook-token" class="form-label" style="font-size: 1.25rem;">Facebook</label><br>
-        <label for="facebook-token" class="form-label">General Token</label>
+  <h2 class="mb-3">Token Manager</h2>
+
+  <div class="panel">
+    <form method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label class="form-label" style="font-size:1.1rem;">Facebook</label>
+        <label class="form-label">General Token</label>
         <input type="text" id="facebook-token" name="facebook-token" value="{{ token_fb }}" class="form-control" disabled>
-        <p><small class="form-label">Caducidad: {{ date_fb }}</small></p>
-    </div>
-    
-    <div class="mb-3">
-        <label for="twitter-token" class="form-label" style="font-size: 1.25rem;">Twitter</label><br>
-        <label for="twitter-token" class="form-label">Consumer Key</label>
+        <small class="form-text">Caducidad: {{ date_fb }}</small>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" style="font-size:1.1rem;">Twitter</label>
+        <label class="form-label">Consumer Key</label>
         <input type="text" id="twitter-token_1" name="twitter-token_1" value="{{ token_x_1 }}" class="form-control" disabled>
-        <label for="twitter-token" class="form-label">Consumer Secret</label>
+        <label class="form-label">Consumer Secret</label>
         <input type="text" id="twitter-token_2" name="twitter-token_2" value="{{ token_x_2 }}" class="form-control" disabled>
-        <label for="twitter-token" class="form-label">Access Token</label>
+        <label class="form-label">Access Token</label>
         <input type="text" id="twitter-token_3" name="twitter-token_3" value="{{ token_x_3 }}" class="form-control" disabled>
-        <label for="twitter-token" class="form-label">Access Token Secret</label>
+        <label class="form-label">Access Token Secret</label>
         <input type="text" id="twitter-token_4" name="twitter-token_4" value="{{ token_x_4 }}" class="form-control" disabled>
-        <p><small class="form-label">Caducidad: PERMANENTE</small></p>
-    </div>
+        <small class="form-text">Caducidad: PERMANENTE</small>
+      </div>
 
-    <div class="mb-3">
-        <label for="telegram-token" class="form-label" style="font-size: 1.25rem;">Telegram</label><br>
-        <label for="telegram-token" class="form-label">General Token</label>
+      <div class="mb-3">
+        <label class="form-label" style="font-size:1.1rem;">Telegram</label>
+        <label class="form-label">General Token</label>
         <input type="text" id="telegram-token" name="telegram-token" value="{{ token_telegram }}" class="form-control" disabled>
-        <p><small class="form-label">Caducidad: PERMANENTE</small></p>
-        <label for="telegram-token" class="form-label">Chat ID's</label>
+        <small class="form-text d-block mb-2">Caducidad: PERMANENTE</small>
+        <label class="form-label">Chat ID's</label>
         <input type="text" id="telegram-chatid" name="telegram-chatid" value="{{ chat_ids }}" class="form-control" disabled>
-        <p><small class="form-label">Ingresa los Chat ID's separados por comas</small></p>
-    </div>
+        <small class="form-text">Ingresa los Chat ID's separados por comas</small>
+      </div>
 
-    <div class="mb-3">
-        <label for="openai-token" class="form-label" style="font-size: 1.25rem;">OpenAI</label><br>
-        <label for="openai-token" class="form-label">General Token</label>
+      <div class="mb-3">
+        <label class="form-label" style="font-size:1.1rem;">OpenAI</label>
+        <label class="form-label">General Token</label>
         <input type="text" id="openai-token" name="openai-token" value="{{ token_openai }}" class="form-control" disabled>
-        <p><small class="form-label">Caducidad: PERMANENTE</small></p>
-    </div>
+        <small class="form-text">Caducidad: PERMANENTE</small>
+      </div>
 
-    <div class="mb-3">
+      <div class="mb-1">
         <button type="button" onclick="toggleEdit()" id="edit-button" class="btn btn-warning">Editar</button>
-        <button type="submit" id="update-tokens" class="btn btn-success" disabled onclick="return confirm('¿Deseas Continuar? Se modificarán los tokens de acceso, esta acción no puede revertirse.');">Actualizar</button>
-    </div>
-    
-</form>
+        <button type="submit" id="update-tokens" class="btn btn-success" disabled
+          onclick="return confirm('¿Deseas Continuar? Se modificarán los tokens de acceso, esta acción no puede revertirse.');">
+          Actualizar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
-    function toggleEdit() {
-        let inputs = document.querySelectorAll('input[type="text"]');
-        let updateButton = document.getElementById('update-tokens');
-        let editButton = document.getElementById('edit-button');
-        
-        let isEditing = inputs[0].hasAttribute('disabled') === false;
-        
-        if (isEditing) {
-            inputs.forEach(input => {
-                input.setAttribute('disabled', 'true');
-                input.value = input.defaultValue; // Revertir cambios
-            });
-            updateButton.setAttribute('disabled', 'true');
-            editButton.textContent = "Editar";
-            editButton.classList.remove("btn-danger");
-            editButton.classList.add("btn-warning");
-        } else {
-            inputs.forEach(input => input.removeAttribute('disabled'));
-            updateButton.removeAttribute('disabled');
-            editButton.textContent = "Cancelar";
-            editButton.classList.remove("btn-warning");
-            editButton.classList.add("btn-danger");
-        }
-    }
-</script>
+  function toggleEdit() {
+    const inputs = document.querySelectorAll('input[type="text"]');
+    const updateButton = document.getElementById('update-tokens');
+    const editButton = document.getElementById('edit-button');
+    const isEditing = inputs[0].hasAttribute('disabled') === false;
 
+    if (isEditing) {
+      inputs.forEach(input => { input.setAttribute('disabled','true'); input.value = input.defaultValue; });
+      updateButton.setAttribute('disabled','true');
+      editButton.textContent = "Editar";
+      editButton.classList.remove("btn-danger");
+      editButton.classList.add("btn-warning");
+    } else {
+      inputs.forEach(input => input.removeAttribute('disabled'));
+      updateButton.removeAttribute('disabled');
+      editButton.textContent = "Cancelar";
+      editButton.classList.remove("btn-warning");
+      editButton.classList.add("btn-danger");
+    }
+  }
+</script>
 {% endblock %}

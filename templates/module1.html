@@ -1,38 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="mb-3">
-  <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Volver al Menú Principal</a>
+<div class="sheet">
+  <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3 mb-3">Volver al Menú Principal</a>
+
+  <h2 class="mb-3">Publicador de Redes Sociales</h2>
+
+  <div class="panel">
+    <form id="publishForm" method="post" enctype="multipart/form-data">
+      <!-- Mensaje -->
+      <div class="mb-3">
+        <label for="mensaje" class="form-label">Mensaje (máximo 270 caracteres):</label>
+        <textarea name="mensaje" id="mensaje" class="form-control" maxlength="270" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+      </div>
+
+      <!-- Redes -->
+      <label class="form-label">Redes Sociales a Publicar:</label>
+      <div class="mb-2 form-check">
+        <input type="checkbox" name="facebook" class="form-check-input" id="facebook" checked>
+        <label class="form-check-label" for="facebook">Facebook</label>
+      </div>
+      <div class="mb-3 form-check">
+        <input type="checkbox" name="twitter" class="form-check-input" id="twitter" checked>
+        <label class="form-check-label" for="twitter">X (Twitter)</label>
+      </div>
+
+      <!-- Imagen -->
+      <div class="mb-3">
+        <label for="imagen" class="form-label">Imagen (opcional):</label>
+        <div id="drop-area" class="drop-area">
+          <p id="drop-text" class="mb-2">Arrastra y suelta tu imagen aquí o haz clic para seleccionarla</p>
+          <input type="file" name="imagen" id="imagen" accept="image/*">
+          <button type="button" id="remove-btn" class="btn btn-sm btn-danger mt-2" style="display:none;">Remover</button>
+          <div id="preview"></div>
+        </div>
+      </div>
+
+      <button type="submit" id="publish-btn" class="btn btn-primary">Publicar</button>
+    </form>
+  </div>
 </div>
-<h2>Publicador de Redes Sociales</h2>
-<form id="publishForm" method="post" enctype="multipart/form-data">
-  <!-- Campo de mensaje: Textarea -->
-  <div class="mb-3">
-    <label for="mensaje" class="form-label">Mensaje (máximo 270 caracteres):</label>
-    <textarea name="mensaje" id="mensaje" class="form-control" maxlength="270" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
-  </div>
-  <!-- Checkbox Redes Elegidas -->
-  <label for="mensaje" class="form-label">Redes Sociales a Publicar:</label>
-  <div class="mb-3 form-check">
-    <input type="checkbox" name="facebook" class="form-check-input" id="facebook" checked>
-    <label class="form-check-label" for="facebook">Facebook</label>
-  </div>
-  <div class="mb-3 form-check">
-    <input type="checkbox" name="twitter" class="form-check-input" id="twitter" checked>
-    <label class="form-check-label" for="twitter">X (Twitter)</label>
-  </div>
-  <!-- Área para imagen: Drop Area -->
-  <div class="mb-3">
-    <label for="imagen" class="form-label">Imagen (opcional):</label>
-    <div id="drop-area" class="drop-area">
-      <p id="drop-text">Arrastra y suelta tu imagen aquí o haz clic para seleccionarla</p>
-      <input type="file" name="imagen" id="imagen" accept="image/*">
-      <!-- Botón de remover, inicialmente oculto -->
-      <button type="button" id="remove-btn" class="btn btn-sm btn-danger mt-2" style="display:none;">Remover</button>
-    </div>
-  </div>
-  <!-- Botón de publicación -->
-  <button type="submit" id="publish-btn" class="btn btn-primary">Publicar</button>
-</form>
 
 <script>
   const dropArea = document.getElementById('drop-area');
@@ -40,53 +46,33 @@
   const dropText = document.getElementById('drop-text');
   const removeBtn = document.getElementById('remove-btn');
 
-  // Prevenir comportamiento por defecto en drag & drop
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, preventDefaults, false);
-    document.body.addEventListener(eventName, preventDefaults, false);
+  ['dragenter','dragover','dragleave','drop'].forEach(ev=>{
+    dropArea.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, false);
+    document.body.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, false);
   });
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  // Resaltar el área al arrastrar
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+  ['dragenter','dragover'].forEach(ev=>{
+    dropArea.addEventListener(ev, ()=> dropArea.classList.add('highlight'), false);
   });
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+  ['dragleave','drop'].forEach(ev=>{
+    dropArea.addEventListener(ev, ()=> dropArea.classList.remove('highlight'), false);
   });
 
-  // Manejar archivos soltados
-  dropArea.addEventListener('drop', (e) => {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    fileInput.files = files;
+  dropArea.addEventListener('drop', e=>{
+    fileInput.files = e.dataTransfer.files;
     handleFiles();
   });
-
-  // Permitir clic en el área para abrir el selector
-  dropArea.addEventListener('click', () => fileInput.click());
+  dropArea.addEventListener('click', ()=> fileInput.click());
   fileInput.addEventListener('change', handleFiles);
 
-  function handleFiles() {
+  function handleFiles(){
     const files = fileInput.files;
-    if (files && files[0]) {
+    if(files && files[0]){
       const file = files[0];
       const reader = new FileReader();
-      reader.onload = function(e) {
-        // Crear o actualizar el contenedor de preview sin eliminar el input
-        let previewContainer = document.getElementById('preview');
-        if (!previewContainer) {
-          previewContainer = document.createElement('div');
-          previewContainer.id = 'preview';
-          // Insertar el contenedor de preview justo debajo del drop text
-          dropArea.appendChild(previewContainer);
-        }
-        previewContainer.innerHTML = `
-          <img src="${e.target.result}" alt="${file.name}" 
-               style="max-width:100%; max-height:200px; display:block; margin:auto;">
+      reader.onload = e=>{
+        const preview = document.getElementById('preview');
+        preview.innerHTML = `
+          <img src="${e.target.result}" alt="${file.name}">
           <p>${file.name}</p>
         `;
         removeBtn.style.display = 'inline-block';
@@ -95,50 +81,19 @@
     }
   }
 
-  removeBtn.addEventListener('click', (e) => {
+  removeBtn.addEventListener('click', e=>{
     e.stopPropagation();
-    // Limpiar el input sin eliminarlo del DOM
     fileInput.value = "";
-    // Limpiar el contenedor de preview
-    const previewContainer = document.getElementById('preview');
-    if (previewContainer) {
-      previewContainer.innerHTML = "";
-    }
+    document.getElementById('preview').innerHTML = "";
     removeBtn.style.display = 'none';
   });
 
-  // -- Deshabilitar el botón "Publicar" y cambiar el texto al enviar el formulario --
+  // Deshabilitar botón en envío
   const publishForm = document.getElementById('publishForm');
   const publishBtn = document.getElementById('publish-btn');
-  publishForm.addEventListener('submit', () => {
+  publishForm.addEventListener('submit', ()=>{
     publishBtn.disabled = true;
     publishBtn.innerText = "Publicando, por favor espere...";
   });
 </script>
-
-<style>
-  /* Drop Area: se adapta al ancho similar a .form-control */
-  .drop-area {
-    border: 2px dashed #ccc;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s, border-color 0.3s;
-    width: 35%;
-    box-sizing: border-box;
-  }
-  .drop-area.highlight {
-    background-color: #f0f8ff;
-    border-color: #00B0F6;
-  }
-  .drop-area input[type="file"] {
-    display: none;
-  }
-  @media (max-width: 768px) {
-    .drop-area {
-      width: 98%;
-    }
-  }
-</style>
 {% endblock %}
