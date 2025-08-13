@@ -121,11 +121,52 @@ class GeneratedPassword(db.Model):
 # models.py
 class PSPs(db.Model):
     __tablename__ = 'credentials'
-    id              = db.Column(db.String(40), primary_key=True)  # p.ej. DSI-EOAG, DSI-EOAG-2
-    name            = db.Column(db.String(120), nullable=False)
-    email           = db.Column(db.String(255), nullable=False)
-    direccion       = db.Column(db.String(120), nullable=False)   # Dirección del PSP
-    servicio        = db.Column(db.String(255), nullable=True)    # Requerimiento de Servicio
-    telefono        = db.Column(db.String(32),  nullable=True)
-    valid           = db.Column(db.Boolean, nullable=False, default=True)
+
+    id = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=True)
+    direccion = db.Column(db.String, nullable=True)
+    servicio = db.Column(db.String, nullable=True)
+    telefono = db.Column(db.String, nullable=True)
+
+    valid = db.Column(db.Boolean, nullable=False, default=True)
     expiration_date = db.Column(db.DateTime, nullable=True)
+
+    # NUEVO: jefe directo (0..1)
+    supervisor_id = db.Column(
+        db.String,
+        db.ForeignKey('credentials.id', ondelete='SET NULL'),
+        nullable=True,
+        index=True
+    )
+    supervisor = db.relationship(
+        'PSPs',
+        remote_side=[id],
+        backref=db.backref('subordinates', lazy='dynamic'),
+        foreign_keys=[supervisor_id],
+        lazy='joined'
+    )
+
+    # Utilidades opcionales
+    def direct_boss(self):
+        return self.supervisor
+
+    def direct_reports(self):
+        return self.subordinates.order_by(PSPs.name)
+
+    def director(self):
+        """
+        Director = el *ancestro* cuyo supervisor es el Director General (que no tiene jefe).
+        Si el PSP reporta directo al Director General, el propio PSP es director.
+        Si el PSP es el Director General (sin jefe), devuelve None.
+        """
+        if self.supervisor is None:
+            return None
+        # Recorremos hacia arriba guardando el anterior
+        node = self
+        prev = None
+        while node.supervisor is not None:
+            prev = node
+            node = node.supervisor
+        # node es el Director General (sin jefe), prev es el director en la cadena
+        return prev

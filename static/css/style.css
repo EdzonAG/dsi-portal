@@ -205,6 +205,21 @@ body::before{
   color: var(--bs-table-hover-color) !important;
 }
 
+/* Columnas y truncado en tabla de PSPs */
+.col-email { max-width: 260px; }
+@media (max-width: 1200px){ .col-email { max-width: 220px; } }
+@media (max-width: 992px){  .col-email { max-width: 180px; } }
+@media (max-width: 768px){  .col-email { max-width: 140px; } }
+
+.ellipsis{
+  display:inline-block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  vertical-align:bottom;
+}
+
 
 /* ===============================
    Formularios

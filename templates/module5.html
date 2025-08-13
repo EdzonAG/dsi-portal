@@ -26,12 +26,10 @@
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <!-- <th>Correo</th> -->
-            <!-- <th>Dirección</th> -->
-            <!-- <th>Servicio</th> -->
+            <th class="col-email">Correo</th>
             <th>Estado</th>
             <th>Expira</th>
-            <th style="width:150px">Acciones</th>
+            <th style="width:100px">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -39,44 +37,89 @@
           <tr>
             <td class="small">{{ item.id }}</td>
             <td class="small">{{ item.name }}</td>
-            <!-- <td class="small">{{ item.email }}</td> -->
-            <!-- <td class="small">{{ item.direccion }}</td> -->
-            <!-- <td class="small">{{ item.servicio or '-' }}</td> -->
+
+            {# Correo truncado con tooltip #}
+            <td class="small col-email">
+              <span class="ellipsis" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ item.email }}">
+                {{ item.email }}
+              </span>
+            </td>
+
             <td>
-              {% if item.valid in ['ACTIVO', True, 'True'] %}
+              {% if item.valid in ['ACTIVO', True, 'True'] and item.expiration_date and item.expiration_date >= today %}
                 <span class="badge rounded-pill bg-success">Activo</span>
               {% else %}
                 <span class="badge rounded-pill bg-secondary">Inactivo</span>
               {% endif %}
             </td>
-            <td class="small">{{ item.expiration_date.strftime('%Y-%m-%d') if item.expiration_date else '-' }}</td>
-            <td class="text-nowrap">
-              <a href="{{ url_for('credenciales.verify_credentials', psp_id=item.id) }}"
-                 class="btn btn-sm btn-info" title="Visualizar">
-                <i class="fa-solid fa-eye"></i>
-              </a>
-              <a href="{{ url_for('credenciales.edit_psp', psp_id=item.id) }}"
-                 class="btn btn-sm btn-warning" title="Editar">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-              <a href="{{ url_for('credenciales.qr_psp', psp_id=item.id) }}"
-                 class="btn btn-sm btn-light" title="Descargar QR">
-                <i class="fa-solid fa-qrcode"></i>
-              </a>
-              <form method="post" action="{{ url_for('credenciales.delete_credentials', psp_id=item.id) }}"
-                    style="display:inline;" onsubmit="return confirm('¿Eliminar este registro?');">
-                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                  <i class="fa-solid fa-trash"></i>
+
+            <td class="small">
+              {{ item.expiration_date.strftime('%d/%m/%y') if item.expiration_date else '-' }}
+            </td>
+
+            <td>
+              <div class="btn-group">
+                <!-- Acciones principales visibles -->
+                <a href="{{ url_for('credenciales.verify_credentials', psp_id=item.id) }}"
+                   class="btn btn-sm btn-info" title="Visualizar">
+                  <i class="fa-solid fa-eye"></i>
+                </a>
+                <a href="{{ url_for('credenciales.edit_psp', psp_id=item.id) }}"
+                   class="btn btn-sm btn-warning" title="Editar">
+                  <i class="fa-solid fa-pen"></i>
+                </a>
+
+                <!-- Menú de desbordamiento -->
+                <button type="button" class="btn btn-sm btn-light dropdown-toggle dropdown-toggle-split"
+                        data-bs-toggle="dropdown" aria-expanded="false" title="Más acciones">
+                  <span class="visually-hidden">Más</span>
                 </button>
-              </form>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('credenciales.qr_psp', psp_id=item.id) }}">
+                      <i class="fa-solid fa-qrcode me-2"></i> Descargar QR
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('credenciales.qr_psp', psp_id=item.id) }}">
+                      <i class="fa-solid fa-address-card me-2"></i> Generar firma de correo
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('credenciales.alta_docs', psp_id=item.id) }}">
+                      <i class="fa-solid fa-file-lines me-2"></i> Formatos de alta
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('credenciales.edit_psp', psp_id=item.id) }}">
+                      <i class="fa-solid fa-ban me-2"></i> Formatos de baja
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <form method="post" action="{{ url_for('credenciales.delete_credentials', psp_id=item.id) }}"
+                          onsubmit="return confirm('¿Eliminar este registro?');">
+                      <button type="submit" class="dropdown-item text-danger">
+                        <i class="fa-solid fa-trash me-2"></i> Eliminar
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
             </td>
           </tr>
           {% else %}
-          <tr><td colspan="8" class="text-center text-muted-custom">Sin registros</td></tr>
+          <tr><td colspan="6" class="text-center text-muted-custom">Sin registros</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
+<!-- Activa tooltips para los correos truncados -->
+<script>
+  document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    .forEach(el => new bootstrap.Tooltip(el));
+</script>
 {% endblock %}
