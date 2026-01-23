@@ -1,5 +1,55 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<style>
+    /* Estilos para la galería de previsualización */
+    .preview-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .preview-item {
+        position: relative;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        background: #f9f9f9;
+    }
+    .preview-item img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 2px;
+    }
+    .preview-item .remove-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .preview-item p {
+        font-size: 10px;
+        margin: 2px 0 0 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .highlight {
+        border-color: #007bff !important;
+        background-color: #e9ecef;
+    }
+</style>
+
 <div class="sheet">
   <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3 mb-3">Volver al Menú Principal</a>
 
@@ -7,13 +57,12 @@
 
   <div class="panel">
     <form id="publishForm" method="post" enctype="multipart/form-data">
-      <!-- Mensaje -->
       <div class="mb-3">
         <label for="mensaje" class="form-label">Mensaje (máximo 270 caracteres):</label>
         <textarea name="mensaje" id="mensaje" class="form-control" maxlength="270" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+        <small class="text-muted"><span id="char-count">0</span>/270</small>
       </div>
 
-      <!-- Redes -->
       <label class="form-label">Redes Sociales a Publicar:</label>
       <div class="mb-2 form-check">
         <input type="checkbox" name="facebook" class="form-check-input" id="facebook" checked>
@@ -21,17 +70,16 @@
       </div>
       <div class="mb-3 form-check">
         <input type="checkbox" name="twitter" class="form-check-input" id="twitter" checked>
-        <label class="form-check-label" for="twitter">X (Twitter)</label>
+        <label class="form-check-label" for="twitter">X (Twitter) <small class="text-muted">(Máx 4 imágenes)</small></label>
       </div>
 
-      <!-- Imagen -->
       <div class="mb-3">
-        <label for="imagen" class="form-label">Imagen (opcional):</label>
-        <div id="drop-area" class="drop-area">
-          <p id="drop-text" class="mb-2">Arrastra y suelta tu imagen aquí o haz clic para seleccionarla</p>
-          <input type="file" name="imagen" id="imagen" accept="image/*">
-          <button type="button" id="remove-btn" class="btn btn-sm btn-danger mt-2" style="display:none;">Remover</button>
-          <div id="preview"></div>
+        <label class="form-label">Imágenes (opcional, múltiple):</label>
+        <div id="drop-area" class="drop-area border p-4 text-center" style="border-style: dashed !important; cursor: pointer;">
+          <p id="drop-text" class="mb-2">Arrastra y suelta tus imágenes aquí o haz clic para agregar</p>
+          <input type="file" name="imagen" id="imagen" accept="image/*" multiple style="display: none;">
+          
+          <div id="gallery" class="preview-gallery"></div>
         </div>
       </div>
 
@@ -43,57 +91,116 @@
 <script>
   const dropArea = document.getElementById('drop-area');
   const fileInput = document.getElementById('imagen');
-  const dropText = document.getElementById('drop-text');
-  const removeBtn = document.getElementById('remove-btn');
+  const gallery = document.getElementById('gallery');
+  const charCount = document.getElementById('char-count');
+  const msgInput = document.getElementById('mensaje');
 
+  // Array global para almacenar los archivos seleccionados
+  let storedFiles = [];
+
+  // Contador de caracteres
+  msgInput.addEventListener('input', function() {
+      charCount.textContent = this.value.length;
+  });
+
+  // Eventos de Drag & Drop
   ['dragenter','dragover','dragleave','drop'].forEach(ev=>{
     dropArea.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, false);
-    document.body.addEventListener(ev, e=>{ e.preventDefault(); e.stopPropagation(); }, false);
   });
+
   ['dragenter','dragover'].forEach(ev=>{
     dropArea.addEventListener(ev, ()=> dropArea.classList.add('highlight'), false);
   });
+
   ['dragleave','drop'].forEach(ev=>{
     dropArea.addEventListener(ev, ()=> dropArea.classList.remove('highlight'), false);
   });
 
-  dropArea.addEventListener('drop', e=>{
-    fileInput.files = e.dataTransfer.files;
-    handleFiles();
+  // Drop
+  dropArea.addEventListener('drop', e => {
+    const dt = e.dataTransfer;
+    handleFiles(dt.files);
   });
-  dropArea.addEventListener('click', ()=> fileInput.click());
-  fileInput.addEventListener('change', handleFiles);
 
-  function handleFiles(){
-    const files = fileInput.files;
-    if(files && files[0]){
-      const file = files[0];
+  // Click para abrir selector
+  dropArea.addEventListener('click', (e) => {
+      // Evitar que el clic en el botón de borrar dispare el input
+      if(e.target.className !== 'remove-badge') {
+          fileInput.click();
+      }
+  });
+
+  // Cambio en el input (selección manual)
+  fileInput.addEventListener('change', () => {
+    handleFiles(fileInput.files);
+  });
+
+  function handleFiles(files) {
+    if (!files.length) return;
+
+    // Convertir FileList a Array y concatenar con los existentes
+    const newFiles = Array.from(files);
+    
+    // Validar duplicados (opcional) o simplemente agregar
+    newFiles.forEach(file => {
+        // Evitamos duplicados exactos por nombre y tamaño para limpieza visual
+        if(!storedFiles.some(f => f.name === file.name && f.size === file.size)){
+            storedFiles.push(file);
+        }
+    });
+
+    updateInputAndGallery();
+  }
+
+  function updateInputAndGallery() {
+    // 1. Actualizar visualmente la galería
+    gallery.innerHTML = '';
+    
+    storedFiles.forEach((file, index) => {
       const reader = new FileReader();
-      reader.onload = e=>{
-        const preview = document.getElementById('preview');
-        preview.innerHTML = `
-          <img src="${e.target.result}" alt="${file.name}">
-          <p>${file.name}</p>
-        `;
-        removeBtn.style.display = 'inline-block';
-      };
       reader.readAsDataURL(file);
+      reader.onloadend = function() {
+        const div = document.createElement('div');
+        div.className = 'preview-item';
+        div.innerHTML = `
+            <img src="${reader.result}" alt="${file.name}">
+            <span class="remove-badge" onclick="removeFile(${index})">×</span>
+            <p>${file.name}</p>
+        `;
+        gallery.appendChild(div);
+      }
+    });
+
+    // 2. Actualizar el input file real usando DataTransfer
+    const dataTransfer = new DataTransfer();
+    storedFiles.forEach(file => {
+        dataTransfer.items.add(file);
+    });
+    fileInput.files = dataTransfer.files;
+    
+    // Actualizar texto si hay archivos
+    const dropText = document.getElementById('drop-text');
+    if(storedFiles.length > 0) {
+        dropText.innerText = `${storedFiles.length} archivo(s) listo(s). Clic o arrastrar para agregar más.`;
+    } else {
+        dropText.innerText = "Arrastra y suelta tus imágenes aquí o haz clic para agregar";
     }
   }
 
-  removeBtn.addEventListener('click', e=>{
-    e.stopPropagation();
-    fileInput.value = "";
-    document.getElementById('preview').innerHTML = "";
-    removeBtn.style.display = 'none';
-  });
+  // Función global para remover archivo individual
+  window.removeFile = function(index) {
+      storedFiles.splice(index, 1);
+      updateInputAndGallery();
+      // Detener propagación del click al dropArea es manejado en la estructura HTML/CSS o lógica de update
+      event.stopPropagation(); 
+  };
 
   // Deshabilitar botón en envío
   const publishForm = document.getElementById('publishForm');
   const publishBtn = document.getElementById('publish-btn');
   publishForm.addEventListener('submit', ()=>{
     publishBtn.disabled = true;
-    publishBtn.innerText = "Publicando, por favor espere...";
+    publishBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Publicando...';
   });
 </script>
 {% endblock %}

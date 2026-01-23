@@ -1,11 +1,35 @@
-Flask
-Flask-Login
-Flask-SQLAlchemy
-Flask-Mail
-tweepy
-facebook-sdk
-requests
-fpdf
-passlib
-pytest
-segno
+# ----------------------------
+# Core Flask stack
+# ----------------------------
+Flask>=2.3,<3.1
+Flask-Login>=0.6
+Flask-SQLAlchemy>=3.1
+Flask-Mail>=0.9
+
+# ----------------------------
+# HTTP / APIs
+# ----------------------------
+requests>=2.31
+tweepy>=4.14
+facebook-sdk>=3.1
+
+# ----------------------------
+# Seguridad / Auth
+# ----------------------------
+passlib>=1.7
+
+# ----------------------------
+# PDF / Docs
+# ----------------------------
+fpdf>=1.7
+python-docx>=1.1
+
+# PDF Manager module
+PyMuPDF>=1.23          # PDF -> imágenes
+pikepdf>=9.0           # Compresión sin pérdida (opcional, fallback)
+
+# ----------------------------
+# Utilidades
+# ----------------------------
+segno>=1.6             # QR
+pytest>=7.4            # Tests

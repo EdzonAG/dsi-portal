@@ -7,6 +7,7 @@ from modules.module2 import module2_bp
 from modules.module3 import module3_bp
 from modules.module4 import module4_bp
 from modules.module5 import module5_bp
+from modules.module6 import module6_bp
 from modules.auth import auth_bp
 from modules.admin import admin_bp
 from modules.registration import registration_bp
@@ -59,6 +60,7 @@ app.register_blueprint(module2_bp, url_prefix="/tokens")
 app.register_blueprint(module3_bp, url_prefix="/minutas")
 app.register_blueprint(module4_bp, url_prefix="/password_generator")
 app.register_blueprint(module5_bp, url_prefix="/credenciales")
+app.register_blueprint(module6_bp, url_prefix="/pdf_manager")
 app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(registration_bp, url_prefix="/auth")
@@ -94,4 +96,4 @@ def check_if_suspended():
             return redirect(url_for('auth.login'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='localhost', port=8080, debug=True)
