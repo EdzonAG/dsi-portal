@@ -5,7 +5,6 @@ import io
 import os
 import shutil
 import subprocess
-import tempfile
 import uuid
 import zipfile
 from pathlib import Path
@@ -40,6 +39,7 @@ module6_bp = Blueprint("pdf_manager", __name__, template_folder="../templates")
 ALLOWED_EXTENSIONS = {".pdf"}
 MAX_UPLOAD_MB_DEFAULT = 50  # puedes sobrescribir con app.config["PDF_MANAGER_MAX_UPLOAD_MB"]
 
+
 def _ensure_dirs() -> Tuple[Path, Path]:
     """
     Crea carpetas de trabajo dentro de instance/ para no ensuciar el repo.
@@ -51,12 +51,15 @@ def _ensure_dirs() -> Tuple[Path, Path]:
     outputs.mkdir(parents=True, exist_ok=True)
     return uploads, outputs
 
+
 def _max_upload_bytes() -> int:
     mb = int(current_app.config.get("PDF_MANAGER_MAX_UPLOAD_MB", MAX_UPLOAD_MB_DEFAULT))
     return mb * 1024 * 1024
 
+
 def _is_allowed_pdf(filename: str) -> bool:
     return Path(filename).suffix.lower() in ALLOWED_EXTENSIONS
+
 
 def _save_upload(file_storage) -> Path:
     """
@@ -69,18 +72,20 @@ def _save_upload(file_storage) -> Path:
     if not filename or not _is_allowed_pdf(filename):
         raise ValueError("Archivo inválido. Solo se permiten PDFs.")
 
-    # Tamaño (si el cliente lo manda). Igual validamos después leyendo el stream.
     file_storage.stream.seek(0, os.SEEK_END)
     size = file_storage.stream.tell()
     file_storage.stream.seek(0)
     if size > _max_upload_bytes():
-        raise ValueError(f"El archivo excede el límite permitido ({_max_upload_bytes()//(1024*1024)} MB).")
+        raise ValueError(
+            f"El archivo excede el límite permitido ({_max_upload_bytes()//(1024*1024)} MB)."
+        )
 
     uploads_dir, _ = _ensure_dirs()
     unique = f"{uuid.uuid4().hex}_{filename}"
     out_path = uploads_dir / unique
     file_storage.save(out_path)
     return out_path
+
 
 def _module_context():
     m = Module.query.filter_by(identifier="pdf_manager").first()
@@ -121,7 +126,6 @@ def _pdf_to_images_zip(
 
     doc = fitz.open(pdf_path)
     try:
-        # Matriz para DPI
         zoom = dpi / 72.0
         mat = fitz.Matrix(zoom, zoom)
 
@@ -131,16 +135,11 @@ def _pdf_to_images_zip(
                 page = doc.load_page(i)
                 pix = page.get_pixmap(matrix=mat, alpha=False)
 
-                # Grayscale opcional (simple): convertimos en pixmap de 1 canal
                 if grayscale:
                     pix = fitz.Pixmap(fitz.csGRAY, pix)
 
                 base_name = f"page_{i+1:04d}.{img_format}"
                 img_bytes = pix.tobytes(output=img_format)
-
-                # Si es JPG, PyMuPDF respeta compresión; calidad la aplicamos vía PIL si deseas.
-                # Para mantener dependencias mínimas, dejamos PyMuPDF directo.
-                # Si quieres control fino de calidad, se puede integrar Pillow.
                 zf.writestr(base_name, img_bytes)
 
         zip_buffer.seek(0)
@@ -150,33 +149,16 @@ def _pdf_to_images_zip(
 
 
 # -------------------------
-# PDF Compress
+# PDF Compress (GHOSTSCRIPT ONLY)
 # -------------------------
 
-def _compress_pdf_with_pikepdf(input_pdf: Path, output_pdf: Path) -> bool:
-    """
-    Compresión/optimización "lossless" compatible con más versiones de pikepdf.
-    Retorna True si se pudo usar pikepdf.
-    """
-    try:
-        import pikepdf  # type: ignore
-    except Exception:
-        return False
-
-    with pikepdf.open(str(input_pdf)) as pdf:
-        # Guardado básico + (si existe) linearize
-        # (algunas versiones soportan linearize, otras no)
-        try:
-            pdf.save(str(output_pdf), linearize=True)
-        except TypeError:
-            pdf.save(str(output_pdf))
-    return True
-
 def _gs_available() -> Optional[str]:
-    for cmd in ("gs", "gswin64c", "gswin32c"):
+    # En Ubuntu normalmente es /usr/bin/gs, pero usamos which para no amarrarlo.
+    for cmd in ("gs",):
         if shutil.which(cmd):
             return cmd
     return None
+
 
 def _compress_pdf_with_ghostscript(
     input_pdf: Path,
@@ -190,7 +172,7 @@ def _compress_pdf_with_ghostscript(
     """
     gs_cmd = _gs_available()
     if not gs_cmd:
-        raise RuntimeError("Ghostscript no está instalado o no está en PATH.")
+        raise RuntimeError("Ghostscript no está instalado o no está en PATH (no se encontró 'gs').")
 
     preset = preset.lower().strip()
     allowed = {"screen", "ebook", "printer", "prepress", "default"}
@@ -200,7 +182,6 @@ def _compress_pdf_with_ghostscript(
     if dpi < 50 or dpi > 300:
         raise ValueError("DPI inválido para compresión (50–300).")
 
-    # Ghostscript args típicos para reducir peso
     args = [
         gs_cmd,
         "-sDEVICE=pdfwrite",
@@ -222,7 +203,6 @@ def _compress_pdf_with_ghostscript(
     proc = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if proc.returncode != 0:
         raise RuntimeError(f"Ghostscript falló: {proc.stderr.strip() or proc.stdout.strip()}")
-    # Si no redujo nada (o aumentó), intenta un preset más agresivo o pikepdf
 
 
 # -------------------------
@@ -284,23 +264,16 @@ def compress_pdf():
         _, outputs_dir = _ensure_dirs()
         out_path = outputs_dir / f"{pdf_path.stem}_compressed.pdf"
 
-        # 1) Preferir Ghostscript SIEMPRE (porque es el que realmente reduce)
-        gs_cmd = _gs_available()
-        if gs_cmd:
-            try:
-                _compress_pdf_with_ghostscript(pdf_path, out_path, preset=preset, dpi=dpi)
-            except Exception as gs_err:
-                # fallback a pikepdf si GS falló por algo
-                tmp_out = outputs_dir / f"{pdf_path.stem}_pikepdf.pdf"
-                used_pikepdf = _compress_pdf_with_pikepdf(pdf_path, tmp_out)
-                if not used_pikepdf:
-                    raise gs_err
-                out_path = tmp_out
-        else:
-            # 2) Si no hay Ghostscript, intentar pikepdf
-            used_pikepdf = _compress_pdf_with_pikepdf(pdf_path, out_path)
-            if not used_pikepdf:
-                raise RuntimeError("No está disponible Ghostscript ni pikepdf para comprimir.")
+        in_size = pdf_path.stat().st_size
+        _compress_pdf_with_ghostscript(pdf_path, out_path, preset=preset, dpi=dpi)
+        out_size = out_path.stat().st_size
+
+        # Si no reduce, avisamos para que el usuario no piense que "no hizo nada".
+        if out_size >= in_size:
+            flash(
+                "Aviso: el PDF resultante no fue más pequeño. Puede que el archivo ya esté optimizado.",
+                "warning",
+            )
 
         return send_file(
             str(out_path),
