@@ -153,8 +153,11 @@ def _pdf_to_images_zip(
 # -------------------------
 
 def _gs_available() -> Optional[str]:
-    # En Ubuntu normalmente es /usr/bin/gs, pero usamos which para no amarrarlo.
-    for cmd in ("gs",):
+    # Prioridad: ruta fija (producción) y luego fallback a PATH
+    candidates = ["/usr/bin/gs", "/usr/local/bin/gs", "gs"]
+    for cmd in candidates:
+        if cmd.startswith("/") and Path(cmd).exists():
+            return cmd
         if shutil.which(cmd):
             return cmd
     return None
